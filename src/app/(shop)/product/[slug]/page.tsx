@@ -2,10 +2,10 @@
 import { use } from 'react';
 import { initialData } from "@/seed/seed-data";
 import { notFound } from "next/navigation";
-import { IoCheckmarkCircleOutline } from "react-icons/io5";
+import { IoCheckmarkCircleOutline, IoCartOutline } from "react-icons/io5";
 
 // Import all components from the barrel file
-import { 
+import {
   ProductSlideshow,
   SizeSelector,
   QuantitySelector,
@@ -30,7 +30,7 @@ export default function ProductPage({ params }: Props) {
     <div className="mt-5 mb-20 grid grid-cols-1 md:grid-cols-3 gap-3">
       {/* Slideshow */}
       <div className="col-span-1 md:col-span-2">
-        <ProductSlideshow 
+        <ProductSlideshow
           images={product.images}
           title={product.title}
         />
@@ -44,7 +44,7 @@ export default function ProductPage({ params }: Props) {
         {/* Selector de Tallas */}
         <div className="mb-5">
           <h3 className="font-bold mb-4">Tallas Disponibles</h3>
-          <SizeSelector 
+          <SizeSelector
             selectedSize={product.sizes[0]}
             availableSizes={product.sizes}
           />
@@ -54,38 +54,55 @@ export default function ProductPage({ params }: Props) {
         <div className="mb-5">
           <h3 className="font-bold mb-4">Cantidad</h3>
           <QuantitySelector
-            quantity={1}
+            quantity={2}
             maxQuantity={product.inStock}
-            onQuantityChange={() => {}}
+            onQuantityChange={() => { }}
           />
         </div>
 
         {/* Botón Agregar al Carrito */}
-        <button className="btn-primary mb-5">
-          Agregar al Carrito
-        </button>
+        
+        {product.inStock > 0 &&
+
+          <button
+            className="btn-primary mb-5"
+            disabled={product.inStock === 0}
+          >
+            <IoCartOutline size={20} />
+            Agregar al Carrito
+          </button>
+        }
+                <div className="flex items-center mt-5 mb-3">
+          <IoCheckmarkCircleOutline className="text-green-500 mr-2 text-xl" />
+          <span className="text-sm">
+            {product.inStock > 0
+              ? 'Disponible para envío inmediato'
+              : 'Temporalmente agotado'
+            }
+          </span>
+        </div>
 
         {/* Descripción */}
         <h3 className="font-bold mb-2">Descripción</h3>
         <p className="mb-5">{product.description}</p>
 
         {/* Características del Producto */}
-        <div className="mb-5">
+        {/* <div className="mb-5">
           <h3 className="font-bold mb-2">Características</h3>
           <ul className="list-disc pl-5 space-y-1 text-sm">
             <li>Género: <span className="capitalize">{
               product.gender === 'men' ? 'Hombre' :
-              product.gender === 'women' ? 'Mujer' :
-              product.gender === 'kid' ? 'Niño' : 'Unisex'
+                product.gender === 'women' ? 'Mujer' :
+                  product.gender === 'kid' ? 'Niño' : 'Unisex'
             }</span></li>
             <li>Tipo: <span className="capitalize">{
               product.type === 'shirt' ? 'Camiseta' :
-              product.type === 'pants' ? 'Pantalón' :
-              product.type === 'shoes' ? 'Calzado' : 'Accesorio'
+                product.type === 'pants' ? 'Pantalón' :
+                  product.type === 'shoes' ? 'Calzado' : 'Accesorio'
             }</span></li>
             <li>Disponibles: {product.inStock} unidades</li>
           </ul>
-        </div>
+        </div> */}
 
         {/* PayPal Button */}
         {/* <div className="mt-5 mb-2">
@@ -99,21 +116,13 @@ export default function ProductPage({ params }: Props) {
         </div> */}
 
         {/* Información Adicional */}
-        <div className="flex items-center mt-5">
-          <IoCheckmarkCircleOutline className="text-green-500 mr-2 text-xl" />
-          <span className="text-sm">
-            {product.inStock > 0 
-              ? 'Disponible para envío inmediato'
-              : 'Temporalmente agotado'
-            }
-          </span>
-        </div>
+
 
         {/* Etiquetas */}
-        <div className="mt-5">
+        {/* <div className="mt-5">
           <div className="flex flex-wrap gap-2">
             {product.tags.map((tag) => (
-              <span 
+              <span
                 key={tag}
                 className="text-xs bg-gray-100 px-2 py-1 rounded-full"
               >
@@ -121,7 +130,7 @@ export default function ProductPage({ params }: Props) {
               </span>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -14,9 +14,9 @@ export const SizeSelector = ({ selectedSize, availableSizes }: Props) => {
         <button
           key={size}
           className={`
-            hover:bg-gray-100 text-center rounded-md min-w-12 px-3 py-2
+            text-center rounded-md min-w-12 px-3 py-2
             ${selectedSize === size 
-              ? 'bg-primary-950 text-white hover:bg-primary-900' 
+              ? 'bg-[#d64d04] hover:bg-[#ff7c30]' 
               : 'bg-gray-50'}
           `}
         >
