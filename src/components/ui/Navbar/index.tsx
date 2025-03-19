@@ -24,6 +24,9 @@ const Navbar = () => {
                     <Link href="/category" className="hover:text-gray-600">
                         Categorías
                     </Link>
+                    <Link href="/contact" className="hover:text-gray-600">
+                        Contactenos
+                    </Link>
                     <Link href="/cart">
                         <div className="relative">
                             <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-[#d64d04] rounded-full">
@@ -73,6 +76,14 @@ const Navbar = () => {
                         onClick={() => setIsMenuOpen(false)}
                     >
                         Categorías
+                    </Link>
+        
+                    <Link 
+                        href="/contact" 
+                        className="block hover:text-gray-600"
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        Contactenos
                     </Link>
                 </div>
             </div>

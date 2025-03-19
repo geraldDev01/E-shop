@@ -4,11 +4,13 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { IoMailOutline, IoKeyOutline, IoLogInOutline } from 'react-icons/io5';
 import { login } from '@/api/auth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [apiError, setApiError] = useState<string | null>(null);
   
   const formik = useFormik({
     initialValues: {
@@ -23,18 +25,19 @@ export default function LoginPage() {
         .min(6, 'Mínimo 6 caracteres')
         .required('La contraseña es obligatoria'),
     }),
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
+    onSubmit: async (values, { setSubmitting }) => {
+      setApiError(null);
       try {
         const result = await login(values);
         if (result.success && result.token) {
           localStorage.setItem('token', result.token);
           router.push('/');
         } else {
-          setFieldError('email', result.error || 'Error en la autenticación');
+          setApiError(result.error || 'Error en la autenticación');
         }
       } catch (error) {
         console.error('Login error:', error);
-        setFieldError('email', 'Error en la autenticación');
+        setApiError('Error en la autenticación');
       } finally {
         setSubmitting(false);
       }
@@ -112,16 +115,15 @@ export default function LoginPage() {
             <IoLogInOutline size={20} />
             {formik.isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
+          {apiError && (
+          <p className="mt-4 text-center text-sm text-red-500 bg-red-50 p-2 rounded-md">
+            {apiError}
+          </p>
+        )}
         </form>
 
         {/* Links */}
-        <div className="mt-10 text-center text-sm text-gray-500">
-          <Link 
-            href="/auth/forgot-password" 
-            className="hover:text-primary-950"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
+        <div className="mt-6 text-center text-sm text-gray-500">
           <div className="mt-2">
             ¿No tienes cuenta?{' '}
             <Link 
