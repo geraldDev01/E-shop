@@ -41,20 +41,17 @@ export default function ContactPage() {
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       setApiError(null);
-      setSuccessMessage(null);
-      
       try {
         const result = await sendContactForm({
           message: values
         });
-
         if (result.success) {
           setSuccessMessage(result.message);
           resetForm();
         } else {
           setApiError(result.message);
         }
-      } catch (error) {
+      } catch {
         setApiError('Error al enviar el mensaje');
       } finally {
         setSubmitting(false);
@@ -84,7 +81,7 @@ export default function ContactPage() {
             rows={4}
             className={`block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset 
               ${formik.touched[name] && formik.errors[name]
-                ? 'ring-red-500 focus:ring-red-500' 
+                ? 'ring-red-500 focus:ring-red-500'
                 : 'ring-gray-300 focus:ring-primary-950'} 
               focus:ring-2 focus:ring-inset`}
           />
@@ -95,7 +92,7 @@ export default function ContactPage() {
             {...formik.getFieldProps(name)}
             className={`block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset 
               ${formik.touched[name] && formik.errors[name]
-                ? 'ring-red-500 focus:ring-red-500' 
+                ? 'ring-red-500 focus:ring-red-500'
                 : 'ring-gray-300 focus:ring-primary-950'} 
               focus:ring-2 focus:ring-inset`}
           />
@@ -115,7 +112,7 @@ export default function ContactPage() {
           <h2 className="mt-4 text-2xl font-bold text-gray-900">
             {successMessage}
           </h2>
-          <Link 
+          <Link
             href="/"
             className="mt-8 inline-flex items-center gap-2 rounded-md bg-[#d64d04] px-6 py-3 text-white hover:bg-[#b33f03] transition-colors"
           >

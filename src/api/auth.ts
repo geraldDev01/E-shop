@@ -1,51 +1,16 @@
 import { apiRequest } from '@/utils/api';
 import { AxiosError } from 'axios';
+import { 
+    AuthResponse, 
+    AuthResult, 
+    LoginCredentials, 
+    RegisterCredentials,
+    ErrorResponse 
+} from '@/types/api';
+import Cookies from 'js-cookie';
+import { redirect } from 'next/navigation';
 
-interface AuthResponse {
-    status_code: number;
-    message: string;
-    data: {
-        access_token: string;
-        token_type: string;
-        expires_in: number;
-        expires_at: string;
-    }
-}
-
-interface LoginCredentials {
-    email: string;
-    password: string;
-}
-
-interface LoginResult {
-    success: boolean;
-    token?: string;
-    error?: string;
-}
-
-interface RegisterCredentials {
-    full_name: string;
-    phone: string;
-    address: string;
-    email: string;
-    password: string;
-    id_deparment: null;
-    id_municipality: null;
-}
-
-interface AuthResult {
-    success: boolean;
-    token?: string;
-    error?: string;
-}
-
-interface ErrorResponse {
-    status_code: number;
-    message: string;
-    errors?: string[];
-}
-
-export const login = async ({ email, password }: LoginCredentials): Promise<LoginResult> => {
+export const login = async ({ email, password }: LoginCredentials): Promise<AuthResult> => {
     try {
         const response = await apiRequest<AuthResponse>({
             endpoint: '/auth/sign-In',
@@ -112,4 +77,12 @@ export const register = async (userData: RegisterCredentials): Promise<AuthResul
             error: "Error en el registro"
         };
     }
+};
+
+export const logout = () => {
+    // Remove the auth token cookie
+    Cookies.remove('auth_token');
+    
+    // Redirect to login page
+    redirect('/');
 };

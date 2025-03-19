@@ -7,9 +7,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { IoMailOutline, IoKeyOutline, IoLogInOutline } from 'react-icons/io5';
 import { login } from '@/api/auth';
+import { useAuth } from '@/context/auth/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login: authLogin } = useAuth();
   const [apiError, setApiError] = useState<string | null>(null);
   
   const formik = useFormik({
@@ -30,7 +32,7 @@ export default function LoginPage() {
       try {
         const result = await login(values);
         if (result.success && result.token) {
-          localStorage.setItem('token', result.token);
+          authLogin(result.token);
           router.push('/');
         } else {
           setApiError(result.error || 'Error en la autenticación');

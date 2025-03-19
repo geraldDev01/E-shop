@@ -1,11 +1,12 @@
 "use client"
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { IoCartOutline } from 'react-icons/io5'
-import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5'
+import { IoCartOutline, IoMenuOutline, IoCloseOutline, IoLogOutOutline } from 'react-icons/io5'
+import { useAuth } from '@/context/auth/AuthContext'
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const { isAuthenticated, logout } = useAuth()
 
     return (
         <header className="sticky top-0 z-50 bg-white shadow-sm shadow-[#d64e044e] border-b border-[#d64d04]">
@@ -27,6 +28,19 @@ const Navbar = () => {
                     <Link href="/contact" className="hover:text-gray-600">
                         Contactenos
                     </Link>
+                    {!isAuthenticated ? (
+                        <Link href="/auth/login" className="hover:text-gray-600">
+                            Iniciar Sesión
+                        </Link>
+                    ) : (
+                        <button 
+                            onClick={logout}
+                            className="flex items-center gap-2 hover:text-gray-600 transition-colors"
+                        >
+                            <IoLogOutOutline className="w-5 h-5" />
+                            <span>Salir</span>
+                        </button>
+                    )}
                     <Link href="/cart">
                         <div className="relative">
                             <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-[#d64d04] rounded-full">
@@ -77,7 +91,6 @@ const Navbar = () => {
                     >
                         Categorías
                     </Link>
-        
                     <Link 
                         href="/contact" 
                         className="block hover:text-gray-600"
@@ -85,6 +98,26 @@ const Navbar = () => {
                     >
                         Contactenos
                     </Link>
+                    {!isAuthenticated ? (
+                        <Link 
+                            href="/auth/login" 
+                            className="block hover:text-gray-600"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Iniciar Sesión
+                        </Link>
+                    ) : (
+                        <button 
+                            onClick={() => {
+                                logout()
+                                setIsMenuOpen(false)
+                            }}
+                            className="flex items-center gap-2 hover:text-gray-600 transition-colors"
+                        >
+                            <IoLogOutOutline className="w-5 h-5" />
+                            <span>Salir</span>
+                        </button>
+                    )}
                 </div>
             </div>
         </header>

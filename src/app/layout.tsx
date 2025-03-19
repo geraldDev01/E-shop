@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import { inter, montserrat } from "@/config/fonts";
+import { AuthProvider } from '@/context/auth/AuthContext';
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} ${montserrat.className}`}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
