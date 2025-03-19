@@ -1,3 +1,4 @@
+import { PublicHeader } from '@/components/ui/PublicHeader';
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,12 +8,13 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-      <div className="w-full max-w-md">
-        {children}
-      </div>
+    <div className="min-h-screen">
+      <PublicHeader />
+      {children}
+    </div>
   );
 }

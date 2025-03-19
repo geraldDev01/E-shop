@@ -2,3 +2,14 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer components {
+  .btn-primary {
+    @apply w-full bg-[#d64d04] text-white py-3 px-4 rounded-md
+           transition-all duration-300
+           hover:bg-[#ff7c30] hover:shadow-lg
+           disabled:opacity-50 disabled:cursor-not-allowed
+           flex items-center justify-center gap-2
+           font-medium text-sm cursor-pointer;
+  }
+}
