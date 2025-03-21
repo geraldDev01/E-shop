@@ -34,6 +34,64 @@ interface BaseItem {
     is_active: boolean;
 }
 
+export const getAllOrders = async () => {
+    try {
+        const response = await apiRequest<ServiceResponse<any>>({
+            endpoint: `/administration/orders`,
+            method: 'GET'
+        });
+
+        return {
+            success: response.status_code === 200,
+            data: response.data,
+            message: response.message
+        };
+    } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+            return {
+                success: false,
+                data: null,
+                message: error.response?.data?.message || 'Error al obtener el producto'
+            };
+        }
+        return {
+            success: false,
+            data: null,
+            message: 'Error al obtener el producto'
+        };
+    }
+};
+
+
+export const getOrderById = async (id: number) => {
+    try {
+        const response = await apiRequest<ServiceResponse<any>>({
+            endpoint: `/administration/orders/${id}`,
+            method: 'GET'
+        });
+
+        return {
+            success: response.status_code === 200,
+            data: response.data,
+            message: response.message
+        };
+    } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+            return {
+                success: false,
+                data: null,
+                message: error.response?.data?.message || 'Error al obtener el producto'
+            };
+        }
+        return {
+            success: false,
+            data: null,
+            message: 'Error al obtener el producto'
+        };
+    }
+};
+
+
 export const getAllUsers = async () => {
     try {
         const response = await apiRequest<ServiceResponse<UserData[]>>({
@@ -120,4 +178,3 @@ export const getAllDepartments = async () => {
     }
 };
 
- 

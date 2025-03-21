@@ -1,29 +1,56 @@
 'use client'
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Link from 'next/link'
 import DataTable from "@/components/ui/DataTable/DataTable";
+import { getAllOrders } from "@/api/administration";
 
 export default function OrderHistoryPage() {
     const [data, setData] = useState([]);
 
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const result = await getAllOrders();
+                if (result.success && result.data) {
+                    setData(result.data);
+                }
+            } catch (error: unknown) {
+                console.error('Failed to load product:', error instanceof Error ? error.message : 'Unknown error');
+
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, []);
 
     const columns = [
-        { Header: "Nombre", accessor: "fulll_name" },
-        { Header: "correo", accessor: "email" },
-        { Header: "Telefono Contacto", accessor: "phone" },
-        { Header: "Departamento", accessor: "department_description" },
-        { Header: "Municipio", accessor: "municipality_description" },
+        { Header: "Numero Orden", accessor: "id" },
+        { Header: "Cliente", accessor: "customer_name" },
+        { Header: "Direccion", accessor: "delivery_address" },
+        { Header: "Telefono", accessor: "contact_phone" },
+        { Header: "Estado Orden", accessor: "order_state_description" },
+        { Header: "Fecha Creacion", accessor: "order_date" },
+        { Header: "Total Envio", accessor: "shipping_fee" },
+        { Header: "Total Orden", accessor: "total_invoice" },
         {
             Header: "Acciones",
             accessor: "id",
             customRender: (index, item) => {
                 return (
-                    <button
-                        className="relative h-10 max-h-[50px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-gray-900 transition-all hover:bg-gray-900/10 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                        type="button"
+
+                    <Link
+                        key={`/admin/orders/${item.id}`}
+                        href={`/admin/orders/${item.id}`}
+                        className="block p-4 hover:bg-gray-700"
 
                     >
-                        ver detalle
-                    </button>
+
+                        <span>Ver</span>
+                    </Link>
                 );
             },
         },

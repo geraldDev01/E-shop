@@ -76,9 +76,6 @@ export const addProduct = async (productData: any) => {
             },
         });
 
-
-
-
         return {
             success: response.status_code === 201,
             message: response.message,
