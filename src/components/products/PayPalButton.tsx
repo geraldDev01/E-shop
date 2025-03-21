@@ -5,7 +5,7 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 
 interface Props {
   amount: number;
-  onSuccess: () => void;
+  onSuccess: (data: any) => void;
   onError?: (error: any) => void;
   currency?: string;
 }
@@ -33,8 +33,8 @@ export const PayPalButton = ({
         });
       }}
       onApprove={(data, actions) => {
-        return actions.order!.capture().then(() => {
-          onSuccess();
+        return actions.order!.capture().then((details) => {
+          onSuccess(details);
         });
       }}
       onError={(err) => {

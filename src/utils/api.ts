@@ -24,7 +24,7 @@ export const apiRequest = async <T>({
       'x-api-key': API_KEY,
       ...headers
     },
-    data
+    ...(method !== 'DELETE' && data && { data })
   };
 
   const response = await axios(config);

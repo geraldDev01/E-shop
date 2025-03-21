@@ -8,6 +8,7 @@ import { IoCartOutline, IoTrashOutline, IoClose, IoWarning } from 'react-icons/i
 import { getFees } from '@/api/fees';
 import { PayPalButton } from '@/components/products/PayPalButton';
 import { Popup } from '@/components/ui/Popup';
+import { createOrder } from '@/api/orders';
 
 // Add interfaces for type safety
 interface CartItem {
@@ -184,17 +185,34 @@ export default function CartPage() {
     loadShippingFee();
   }, [user, router, loadCart, loadShippingFee]);
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (paypalDetails: any) => {
     try {
-      setPopup({
-        show: true,
-        message: 'Pago realizado con éxito',
-        type: 'success'
-      });
-      // Here you would typically clear the cart and redirect
-      // After user closes popup:
-      // router.push('/orders/thank-you');
+      if (!user?.profile || !cart) return;
+
+      const orderData = {
+        customer_id: user.profile.id.toString(),
+        detail: cart.detail.map(item => ({
+          product_id: item.product_id,
+          presentation_id: item.id_presentation,
+          unit_price: parseFloat(item.unit_price),
+          quantity: parseInt(item.quantity)
+        }))
+      };
+
+      const result = await createOrder(user.token, orderData);
+      if (result.success) {
+        setPopup({
+          show: true,
+          message: 'Pago realizado con éxito',
+          type: 'success'
+        });
+        updateCartCount();
+        router.push('/orders/thank-you');
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error) {
+      console.error('Error creating order:', error);
       setPopup({
         show: true,
         message: 'Error al procesar la orden',
