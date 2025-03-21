@@ -1,4 +1,4 @@
-interface Column<T, K extends keyof T> {
+export interface Column<T, K extends keyof T> {
   header: string;
   accessor: K;
   render?: (value: T[K]) => React.ReactNode;

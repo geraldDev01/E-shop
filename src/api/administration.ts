@@ -92,6 +92,40 @@ export const getOrderById = async (id: number) => {
 };
 
 
+export const updateOrderStatus = async (id: number, new_status:string) => {
+    try {
+        const response = await apiRequest<ServiceResponse<any>>({
+            endpoint: `/administration/orders/${id}/status`,
+            method: 'PUT',
+            data: {
+                status_to_update: new_status
+            }
+        });
+
+        return {
+            success: response.status_code === 200,
+            data: response.data,
+            message: response.message
+        };
+    } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+            return {
+                success: false,
+                data: null,
+                message: error.response?.data?.message || 'Error al obtener el producto'
+            };
+        }
+        return {
+            success: false,
+            data: null,
+            message: 'Error al obtener el producto'
+        };
+    }
+};
+
+
+
+
 export const getAllUsers = async () => {
     try {
         const response = await apiRequest<ServiceResponse<UserData[]>>({
@@ -178,3 +212,4 @@ export const getAllDepartments = async () => {
     }
 };
 
+ 

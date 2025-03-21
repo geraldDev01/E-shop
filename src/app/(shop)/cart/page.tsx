@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { getCart, deleteCartItem } from '@/api/cart';
 import { IoCartOutline, IoTrashOutline, IoClose, IoWarning } from 'react-icons/io5';
 import { getFees } from '@/api/fees';
+import { PayPalButton } from '@/components/products/PayPalButton';
+import { Popup } from '@/components/ui/Popup';
+import { createOrder } from '@/api/orders';
 
 // Add interfaces for type safety
 interface CartItem {
@@ -25,6 +28,20 @@ interface Cart {
   sub_total: string;
   created_at: string;
   detail: CartItem[];
+}
+
+// Add PayPal types
+interface PayPalOrderData {
+  orderID: string;
+  payerID: string;
+  paymentID: string | null;
+  billingToken: string | null;
+  facilitatorAccessToken: string;
+}
+
+interface PayPalError {
+  message: string;
+  details?: Array<{ issue: string; description: string }>;
 }
 
 const DeleteConfirmationModal = ({ 
@@ -134,6 +151,15 @@ export default function CartPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [cart, setCart] = useState<Cart | null>(null);
   const [shippingFee, setShippingFee] = useState<string>('0');
+  const [popup, setPopup] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    show: false,
+    message: '',
+    type: 'success'
+  });
 
   const loadCart = useCallback(async () => {
     if (!user) return;
@@ -173,6 +199,52 @@ export default function CartPage() {
     loadShippingFee();
   }, [user, router, loadCart, loadShippingFee]);
 
+  const handlePaymentSuccess = async (paypalDetails: PayPalOrderData) => {
+    try {
+      if (!user?.profile || !cart) return;
+
+      const orderData = {
+        customer_id: user.profile.id.toString(),
+        detail: cart.detail.map(item => ({
+          product_id: item.product_id,
+          presentation_id: item.id_presentation,
+          unit_price: parseFloat(item.unit_price),
+          quantity: parseInt(item.quantity)
+        }))
+      };
+
+      console.log('PayPal Order ID:', paypalDetails.orderID); // Using paypalDetails
+      const result = await createOrder(user.token, orderData);
+      if (result.success) {
+        setPopup({
+          show: true,
+          message: 'Pago realizado con éxito',
+          type: 'success'
+        });
+        updateCartCount();
+        router.push('/orders/thank-you');
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      setPopup({
+        show: true,
+        message: 'Error al procesar la orden',
+        type: 'error'
+      });
+    }
+  };
+
+  const handlePaymentError = (error: PayPalError) => {
+    console.error('Payment error:', error);
+    setPopup({
+      show: true,
+      message: error.message || 'Error al procesar el pago',
+      type: 'error'
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
@@ -200,54 +272,72 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Mi Carrito</h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
-          {cart.detail.map((item) => (
-            <CartItemComponent 
-              key={item.id} 
-              item={item} 
-              onDelete={async (id) => {
-                if (!user) return;
-                try {
-                  const result = await deleteCartItem(user.token, id);
-                  if (result.success) {
-                    await loadCart();
-                    updateCartCount();
+    <>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">Mi Carrito</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-4">
+            {cart.detail.map((item) => (
+              <CartItemComponent 
+                key={item.id} 
+                item={item} 
+                onDelete={async (id) => {
+                  if (!user) return;
+                  try {
+                    const result = await deleteCartItem(user.token, id);
+                    if (result.success) {
+                      await loadCart();
+                      updateCartCount();
+                    }
+                  } catch (error) {
+                    console.error('Error deleting item:', error);
                   }
-                } catch (error) {
-                  console.error('Error deleting item:', error);
-                }
-              }}
-            />
-          ))}
-        </div>
+                }}
+              />
+            ))}
+          </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 h-fit">
-          <h3 className="font-bold text-gray-800 mb-4">Resumen de la Orden</h3>
-          <div className="space-y-2 mb-4">
-            <div className="flex justify-between text-gray-600">
-              <span>Subtotal ({parseInt(cart.total_items)} items)</span>
-              <span>${parseFloat(cart.sub_total).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>Envío</span>
-              <span>${parseFloat(shippingFee).toFixed(2)}</span>
-            </div>
-            <div className="border-t pt-2 mt-2">
-              <div className="flex justify-between font-bold text-gray-800">
-                <span>Total</span>
-                <span>${(parseFloat(cart.sub_total) + parseFloat(shippingFee)).toFixed(2)}</span>
+          <div className="bg-white rounded-lg shadow-sm p-6 h-fit">
+            <h3 className="font-bold text-gray-800 mb-4">Resumen de la Orden</h3>
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between text-gray-600">
+                <span>Subtotal ({parseInt(cart.total_items)} items)</span>
+                <span>${parseFloat(cart.sub_total).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-gray-600">
+                <span>Envío</span>
+                <span>${parseFloat(shippingFee).toFixed(2)}</span>
+              </div>
+              <div className="border-t pt-2 mt-2">
+                <div className="flex justify-between font-bold text-gray-800">
+                  <span>Total</span>
+                  <span>${(parseFloat(cart.sub_total) + parseFloat(shippingFee)).toFixed(2)}</span>
+                </div>
               </div>
             </div>
+            <div className="mt-6">
+              <PayPalButton 
+                amount={parseFloat(cart.sub_total) + parseFloat(shippingFee)}
+                onSuccess={handlePaymentSuccess}
+                onError={handlePaymentError}
+              />
+            </div>
           </div>
-          <button className="btn-primary w-full">
-            Proceder al Pago
-          </button>
         </div>
       </div>
-    </div>
+      
+      <Popup 
+        isOpen={popup.show}
+        onClose={() => {
+          setPopup(prev => ({ ...prev, show: false }));
+          if (popup.type === 'success') {
+            router.push('/orders/thank-you');
+          }
+        }}
+        message={popup.message}
+        type={popup.type}
+      />
+    </>
   );
 }

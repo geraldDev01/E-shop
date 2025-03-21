@@ -75,7 +75,7 @@ export const addProduct = async (productData: any) => {
                 "Content-Type": "multipart/form-data", // ✅ Necesario para subir archivos
             },
         });
-
+        
         return {
             success: response.status_code === 201,
             message: response.message,
