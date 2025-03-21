@@ -46,6 +46,7 @@ export const login = async ({ email, password }: LoginCredentials): Promise<Auth
 
 export const register = async (userData: RegisterCredentials): Promise<AuthResult> => {
     try {
+        console.log("userData", userData);
         const response = await apiRequest<AuthResponse>({
             endpoint: '/auth/sign-up',
             method: 'POST',

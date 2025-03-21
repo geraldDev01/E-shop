@@ -85,6 +85,13 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Mis Órdenes</h2>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <p className="text-center text-gray-500">No hay órdenes disponibles</p>
+        </div>
+      </div>
     </div>
   );
 }

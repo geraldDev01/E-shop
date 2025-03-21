@@ -98,8 +98,8 @@ export default function RegisterPage() {
       try {
         const result = await register({
           ...values,
-          id_department: Number(values.id_department || 0),
-          id_municipality: Number(values.id_municipality || 0),
+          id_department: values.id_department ? Number(values.id_department) : null,
+          id_municipality: values.id_municipality ? Number(values.id_municipality) : null,
         });
         
         if (result.success && result.token) {

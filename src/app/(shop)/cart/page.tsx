@@ -1,9 +1,11 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/auth/AuthContext';
+import { useCart } from '@/context/cart/CartContext';
 import { useRouter } from 'next/navigation';
 import { getCart, deleteCartItem } from '@/api/cart';
 import { IoCartOutline, IoTrashOutline, IoClose, IoWarning } from 'react-icons/io5';
+import { getFees } from '@/api/fees';
 
 // Add interfaces for type safety
 interface CartItem {
@@ -127,9 +129,11 @@ const CartItemComponent = ({ item, onDelete }: { item: CartItem; onDelete: (id: 
 
 export default function CartPage() {
   const { user } = useAuth();
+  const { updateCartCount } = useCart();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [cart, setCart] = useState<Cart | null>(null);
+  const [shippingFee, setShippingFee] = useState<string>('0');
 
   const loadCart = useCallback(async () => {
     if (!user) return;
@@ -146,13 +150,28 @@ export default function CartPage() {
     }
   }, [user]);
 
+  const loadShippingFee = useCallback(async () => {
+    if (!user?.token || !user?.profile?.department_id || !user?.profile?.municipality_id) return;
+    
+    const result = await getFees(
+      user.token,
+      user.profile.department_id,
+      user.profile.municipality_id
+    );
+    
+    if (result.success) {
+      setShippingFee(result.fee);
+    }
+  }, [user?.token, user?.profile?.department_id, user?.profile?.municipality_id]);
+
   useEffect(() => {
     if (user === null) {
       router.replace('/auth/login');
       return;
     }
     loadCart();
-  }, [user, router, loadCart]);
+    loadShippingFee();
+  }, [user, router, loadCart, loadShippingFee]);
 
   if (isLoading) {
     return (
@@ -196,6 +215,7 @@ export default function CartPage() {
                   const result = await deleteCartItem(user.token, id);
                   if (result.success) {
                     await loadCart();
+                    updateCartCount();
                   }
                 } catch (error) {
                   console.error('Error deleting item:', error);
@@ -211,6 +231,16 @@ export default function CartPage() {
             <div className="flex justify-between text-gray-600">
               <span>Subtotal ({parseInt(cart.total_items)} items)</span>
               <span>${parseFloat(cart.sub_total).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-gray-600">
+              <span>Envío</span>
+              <span>${parseFloat(shippingFee).toFixed(2)}</span>
+            </div>
+            <div className="border-t pt-2 mt-2">
+              <div className="flex justify-between font-bold text-gray-800">
+                <span>Total</span>
+                <span>${(parseFloat(cart.sub_total) + parseFloat(shippingFee)).toFixed(2)}</span>
+              </div>
             </div>
           </div>
           <button className="btn-primary w-full">

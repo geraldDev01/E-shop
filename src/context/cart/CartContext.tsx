@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/auth/AuthContext';
 import { getCart } from '@/api/cart';
 
@@ -15,7 +15,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItemsCount, setCartItemsCount] = useState("0");
   const { user, isAuthenticated } = useAuth();
 
-  const updateCartCount = async () => {
+  const updateCartCount = useCallback(async () => {
     if (!isAuthenticated || !user) {
       setCartItemsCount("0");
       return;
@@ -29,11 +29,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error updating cart count:', error);
     }
-  };
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     updateCartCount();
-  }, [isAuthenticated,updateCartCount, user]);
+  }, [isAuthenticated, updateCartCount, user]);
 
   return (
     <CartContext.Provider value={{ cartItemsCount, updateCartCount }}>

@@ -109,7 +109,7 @@ export const getCart = async (token: string) => {
 export const deleteCartItem = async (token: string, itemId: number) => {
   try {
     const response = await apiRequest<{ status_code: number; message: string }>({
-      endpoint: `/customer/cart/${itemId}`,
+      endpoint: `/customer/cart/detail/${itemId}`,
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`
