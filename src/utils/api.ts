@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig, Method } from 'axios';
 
 const API_KEY = 'mombashop123def456ghi789jkl';
-const BASE_URL = 'http://34.228.123.113:3000/api/v1';
-
+//const BASE_URL = 'http://34.228.123.113:3000/api/v1';
+const BASE_URL = 'http://localhost:3000/api/v1';
 interface ApiRequestConfig {
   endpoint: string;
   method?: Method;
