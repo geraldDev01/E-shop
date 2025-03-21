@@ -4,9 +4,11 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IoMailOutline, IoKeyOutline, IoPersonOutline, IoPhonePortraitOutline, IoLocationOutline } from 'react-icons/io5';
 import { register } from '@/api/auth';
+import { useAuth } from '@/context/auth/AuthContext';
+import { getDepartments, getMunicipalities } from '@/api/locations';
 
 type FormValues = {
   full_name: string;
@@ -15,12 +17,43 @@ type FormValues = {
   email: string;
   password: string;
   password_confirmation: string;
+  id_department: string;
+  id_municipality: string;
 };
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { login: authLogin } = useAuth();
   const [apiError, setApiError] = useState<string | null>(null);
+  const [departments, setDepartments] = useState<Array<{ id: number; description: string }>>([]);
+  const [municipalities, setMunicipalities] = useState<Array<{ id: number; description: string }>>([]);
   
+  useEffect(() => {
+    const loadDepartments = async () => {
+      const result = await getDepartments();
+      if (result.success) {
+        setDepartments(result.departments);
+      }
+    };
+    loadDepartments();
+  }, []);
+
+  const handleDepartmentChange = async (departmentId: string) => {
+    formik.setFieldValue('id_department', departmentId);
+    formik.setFieldValue('id_municipality', '');
+    
+    if (departmentId) {
+      const result = await getMunicipalities(Number(departmentId));
+      if (result.success) {
+        setMunicipalities(result.municipalities);
+      } else {
+        setMunicipalities([]);
+      }
+    } else {
+      setMunicipalities([]);
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       full_name: '',
@@ -28,7 +61,9 @@ export default function RegisterPage() {
       address: '',
       email: '',
       password: '',
-      password_confirmation: '', // Added for confirmation
+      password_confirmation: '',
+      id_department: '',
+      id_municipality: '',
     },
     validationSchema: Yup.object({
       full_name: Yup.string()
@@ -53,26 +88,29 @@ export default function RegisterPage() {
       password_confirmation: Yup.string()
         .oneOf([Yup.ref('password')], 'Las contraseñas deben coincidir')
         .required('Confirma tu contraseña'),
+      id_department: Yup.string()
+        .required('El departamento es obligatorio'),
+      id_municipality: Yup.string()
+        .required('El municipio es obligatorio'),
     }),
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
+    onSubmit: async (values, { setSubmitting }) => {
       setApiError(null);
       try {
         const result = await register({
           ...values,
-          id_deparment: null,
-          id_municipality: null,
+          id_department: Number(values.id_department || 0),
+          id_municipality: Number(values.id_municipality || 0),
         });
+        
         if (result.success && result.token) {
-          localStorage.setItem('token', result.token);
+          authLogin(result.token);
           router.push('/');
         } else {
           setApiError(result.error || 'Error en el registro');
-          resetForm();
         }
       } catch (error) {
         console.error('Register error:', error);
         setApiError('Error en el registro');
-        resetForm();
       } finally {
         setSubmitting(false);
       }
@@ -110,6 +148,51 @@ export default function RegisterPage() {
     </div>
   );
 
+  const renderSelectField = (
+    name: 'id_department' | 'id_municipality',
+    label: string,
+    options: Array<{ id: number; description: string }>,
+    icon: React.ReactNode,
+    onChange?: (value: string) => void
+  ) => (
+    <div>
+      <label htmlFor={name} className="block text-sm font-medium leading-6">
+        {label}
+      </label>
+      <div className="relative mt-2">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+          {icon}
+        </div>
+        <select
+          id={name}
+          {...formik.getFieldProps(name)}
+          onChange={(e) => {
+            if (onChange) {
+              onChange(e.target.value);
+            } else {
+              formik.handleChange(e);
+            }
+          }}
+          className={`block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset 
+            ${formik.touched[name] && formik.errors[name]
+              ? 'ring-red-500 focus:ring-red-500' 
+              : 'ring-gray-300 focus:ring-primary-950'} 
+            focus:ring-2 focus:ring-inset`}
+        >
+          <option value="">Seleccionar</option>
+          {options.map(option => (
+            <option key={option.id} value={option.id}>
+              {option.description}
+            </option>
+          ))}
+        </select>
+      </div>
+      {formik.touched[name] && formik.errors[name] && (
+        <p className="mt-2 text-sm text-red-500">{formik.errors[name]}</p>
+      )}
+    </div>
+  );
+
   return (
     <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -132,6 +215,19 @@ export default function RegisterPage() {
             {renderField('address', 'Dirección', 'text', <IoLocationOutline className="text-gray-500" />)}
             {renderField('password', 'Contraseña', 'password', <IoKeyOutline className="text-gray-500" />)}
             {renderField('password_confirmation', 'Confirmar Contraseña', 'password', <IoKeyOutline className="text-gray-500" />)}
+            {renderSelectField(
+              'id_department',
+              'Departamento',
+              departments,
+              <IoLocationOutline className="text-gray-500" />,
+              handleDepartmentChange
+            )}
+            {renderSelectField(
+              'id_municipality',
+              'Municipio',
+              municipalities,
+              <IoLocationOutline className="text-gray-500" />
+            )}
           </div>
 
           <button

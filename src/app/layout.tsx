@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { inter, montserrat } from "@/config/fonts";
 import { AuthProvider } from '@/context/auth/AuthContext';
+import { CartProvider } from '@/context/cart/CartContext';
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,7 +19,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} ${montserrat.className}`}>
         <AuthProvider>
-          {children}
+          <CartProvider>
+            {children}
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

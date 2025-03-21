@@ -39,8 +39,8 @@ export interface RegisterCredentials {
     address: string;
     email: string;
     password: string;
-    id_deparment: null;
-    id_municipality: null;
+    id_department: number;
+    id_municipality: number;
 }
 
 // Contact Form

@@ -3,10 +3,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { UserProfile, getUserProfile } from '@/api/profile';
 
 interface User {
-  email: string;
   token: string;
+  profile?: UserProfile;
 }
 
 interface AuthContextType {
@@ -22,22 +23,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
+  const loadUserProfile = async (token: string) => {
+    const result = await getUserProfile(token);
+    if (result.success && result.profile) {
+      setUser(currentUser => 
+        currentUser ? { ...currentUser, profile: result.profile } : null
+      );
+    }
+  };
+
   useEffect(() => {
-    // Check cookies on mount
     const token = Cookies.get('token');
     if (token) {
-      setUser({ token, email: 'user@example.com' });
+      setUser({ token });
+      loadUserProfile(token);
     }
   }, []);
 
   const login = (token: string) => {
-    // Set cookie with httpOnly and secure flags
     Cookies.set('token', token, {
-      expires: 7, // 7 days
+      expires: 7,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict'
     });
-    setUser({ token, email: 'user@example.com' });
+    setUser({ token });
+    loadUserProfile(token);
   };
 
   const logout = () => {

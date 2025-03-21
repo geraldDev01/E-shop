@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import type { ReactElement } from 'react'
 import { getCategories } from '@/api/categories'
 import Link from 'next/link'
 import { 
@@ -15,8 +16,8 @@ interface Category {
 }
 
 // Map category names to icons
-const getCategoryIcon = (description: string) => {
-  const icons: { [key: string]: JSX.Element } = {
+const getCategoryIcon = (description: string): ReactElement => {
+  const icons: { [key: string]: ReactElement } = {
     'Camisa': <IoShirtOutline className="w-8 h-8" />,
     'Zapatos': <IoFootstepsOutline className="w-8 h-8" />,
     'Gorras': <IoBaseballOutline className="w-8 h-8" />,
@@ -45,6 +46,28 @@ export default function CategoriesPage() {
     return <div className="flex justify-center items-center min-h-[70vh]">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#d64d04]"></div>
     </div>
+  }
+
+  if (!categories.length) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+          <IoStorefrontOutline className="w-24 h-24 text-gray-400 mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            No hay categorías disponibles
+          </h2>
+          <p className="text-gray-600 max-w-md mb-6">
+            En este momento no hay categorías para mostrar. Por favor, vuelve más tarde.
+          </p>
+          <Link 
+            href="/"
+            className="btn-primary inline-flex items-center gap-2"
+          >
+            Volver al inicio
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

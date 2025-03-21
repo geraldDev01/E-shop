@@ -1,11 +1,15 @@
 'use client'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { notFound } from "next/navigation";
 import Image from 'next/image';
 import Link from 'next/link';
-import { IoCheckmarkCircleOutline, IoCartOutline, IoArrowBack } from "react-icons/io5";
+import { IoCartOutline, IoArrowBack, IoCheckmarkCircle, IoClose } from "react-icons/io5";
 import { getProductById } from '@/api/products';
 import type { Product } from '@/api/products';
+import { addToCart } from '@/api/cart';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/auth/AuthContext';
+import { useCart } from '@/context/cart/CartContext';
 
 // Separate client component
 function ProductDetailContent({ id }: { id: string }) {
@@ -14,6 +18,10 @@ function ProductDetailContent({ id }: { id: string }) {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [showSizeError, setShowSizeError] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
+  const { updateCartCount } = useCart();
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -82,9 +90,14 @@ function ProductDetailContent({ id }: { id: string }) {
       }));
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!selectedSize) {
       setShowSizeError(true);
+      return;
+    }
+
+    if (!isAuthenticated) {
+      router.push('/auth/login');
       return;
     }
 
@@ -94,19 +107,73 @@ function ProductDetailContent({ id }: { id: string }) {
 
     if (!selectedPresentation) return;
 
-    const cartItem = {
-      id: product.id,
-      presentationId: selectedPresentation.presentation_id,
-      name: product.name,
-      price: parseFloat(product.price),
-      size: selectedSize,
-      quantity: quantity,
-      image: product.img_url,
-      maxStock: parseInt(selectedPresentation.quantity)
-    };
+    try {
+      const cartData = {
+        product_id: product.id,
+        presentation_id: selectedPresentation.presentation_id,
+        quantity: quantity
+      };
 
-    console.log('Adding to cart:', cartItem);
-    // Here you would add the actual cart logic
+      const result = await addToCart(user!.token, cartData);
+
+      if (result.success) {
+        // Reset form
+        setSelectedSize("");
+        setQuantity(1);
+        setShowSizeError(false);
+        // Update cart count
+        await updateCartCount();
+        // Show success modal
+        setShowSuccessModal(true);
+      } else {
+        console.error('Failed to add product to cart:', result.message);
+      }
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+    }
+  };
+
+  const SuccessModal = () => {
+    if (!showSuccessModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+        <div className="bg-white rounded-lg p-6 max-w-sm w-full relative animate-fade-in">
+          <button 
+            onClick={() => setShowSuccessModal(false)}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          >
+            <IoClose className="w-6 h-6" />
+          </button>
+          
+          <div className="flex flex-col items-center text-center">
+            <div className="mb-4">
+              <IoCheckmarkCircle className="w-16 h-16 text-green-500" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              ¡Producto Agregado!
+            </h3>
+            <p className="text-gray-600 mb-6">
+              El producto ha sido agregado exitosamente a tu carrito
+            </p>
+            <div className="flex gap-4 w-full">
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="flex-1 py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                Seguir Comprando
+              </button>
+              <button
+                onClick={() => router.push('/cart')}
+                className="flex-1 py-2 px-4 bg-[#d64d04] text-white rounded-md hover:bg-[#b54403] transition-colors"
+              >
+                Ver Carrito
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -214,7 +281,7 @@ function ProductDetailContent({ id }: { id: string }) {
 
           {/* Stock Status */}
           <div className="flex items-center mt-2 mb-6">
-            <IoCheckmarkCircleOutline 
+            <IoCheckmarkCircle 
               className={`mr-2 text-xl ${
                 getAvailableSizes().length > 0 ? 'text-green-500' : 'text-red-500'
               }`} 
@@ -236,11 +303,13 @@ function ProductDetailContent({ id }: { id: string }) {
           </div>
         </div>
       </div>
+      <SuccessModal />
     </div>
   );
 }
 
 // Main page component
-export default function Page({ params }: { params: { id: string } }) {
-  return <ProductDetailContent id={params.id} />;
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  return <ProductDetailContent id={resolvedParams.id} />;
 } 
