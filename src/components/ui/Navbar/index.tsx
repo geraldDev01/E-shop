@@ -22,7 +22,7 @@ const Navbar = () => {
                     <Link href="/" className="hover:text-gray-600">
                         Inicio
                     </Link>
-                    <Link href="/category" className="hover:text-gray-600">
+                    <Link href="/categories" className="hover:text-gray-600">
                         Categorías
                     </Link>
                     <Link href="/contact" className="hover:text-gray-600">
@@ -85,7 +85,7 @@ const Navbar = () => {
                         Inicio
                     </Link>
                     <Link 
-                        href="/category" 
+                        href="/categories" 
                         className="block hover:text-gray-600"
                         onClick={() => setIsMenuOpen(false)}
                     >
