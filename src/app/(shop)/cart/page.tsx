@@ -30,6 +30,20 @@ interface Cart {
   detail: CartItem[];
 }
 
+// Add PayPal types
+interface PayPalOrderData {
+  orderID: string;
+  payerID: string;
+  paymentID: string | null;
+  billingToken: string | null;
+  facilitatorAccessToken: string;
+}
+
+interface PayPalError {
+  message: string;
+  details?: Array<{ issue: string; description: string }>;
+}
+
 const DeleteConfirmationModal = ({ 
   isOpen, 
   onClose, 
@@ -185,7 +199,7 @@ export default function CartPage() {
     loadShippingFee();
   }, [user, router, loadCart, loadShippingFee]);
 
-  const handlePaymentSuccess = async (paypalDetails: any) => {
+  const handlePaymentSuccess = async (paypalDetails: PayPalOrderData) => {
     try {
       if (!user?.profile || !cart) return;
 
@@ -199,6 +213,7 @@ export default function CartPage() {
         }))
       };
 
+      console.log('PayPal Order ID:', paypalDetails.orderID); // Using paypalDetails
       const result = await createOrder(user.token, orderData);
       if (result.success) {
         setPopup({
@@ -221,11 +236,11 @@ export default function CartPage() {
     }
   };
 
-  const handlePaymentError = (error: any) => {
+  const handlePaymentError = (error: PayPalError) => {
     console.error('Payment error:', error);
     setPopup({
       show: true,
-      message: 'Error al procesar el pago',
+      message: error.message || 'Error al procesar el pago',
       type: 'error'
     });
   };
