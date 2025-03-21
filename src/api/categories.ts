@@ -1,4 +1,5 @@
 import { apiRequest } from '@/utils/api';
+import { AxiosError } from 'axios';
 
 interface Category {
   id: number;
@@ -23,7 +24,14 @@ export const getCategories = async () => {
       categories: response.data,
       message: response.message
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      return {
+        success: false,
+        categories: [],
+        message: error.response?.data?.message || 'Error al obtener las categorías'
+      };
+    }
     return {
       success: false,
       categories: [],
