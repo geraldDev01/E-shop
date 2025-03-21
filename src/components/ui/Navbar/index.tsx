@@ -75,7 +75,7 @@ const UserMenu = () => {
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, logout } = useAuth()
   const { cartItemsCount } = useCart()
 
   const navLinks = [
