@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { IoChatbubblesOutline, IoSend, IoClose, IoPersonCircleOutline, IoStorefrontOutline } from 'react-icons/io5';
+import { IoChatbubblesOutline, IoSend, IoClose, IoStorefrontOutline } from 'react-icons/io5';
 import { FaQuestionCircle } from 'react-icons/fa';
 
 const FAQS = [
