@@ -11,6 +11,8 @@ import { Popup } from '@/components/ui/Popup';
 import { createOrder } from '@/api/orders';
 import { FaRegCreditCard, FaPaypal, FaUniversity, FaFileUpload } from 'react-icons/fa';
 import { DateTime } from 'luxon';
+import BankTransferForm from '@/components/ui/BankTransferForm';
+import { getFinancialEntities, FinancialEntity } from '@/api/financialEntities';
 
 // Add interfaces for type safety
 interface CartItem {
@@ -146,161 +148,6 @@ const CartItemComponent = ({ item, onDelete }: { item: CartItem; onDelete: (id: 
   );
 };
 
-// Bank transfer form component
-const BankTransferForm = ({
-  amount,
-  onSubmit,
-  isSubmitting
-}: {
-  amount: number;
-  onSubmit: (data: any) => void;
-  isSubmitting: boolean;
-}) => {
-  const [reference, setReference] = useState('');
-  const [date, setDate] = useState(DateTime.now().toFormat('yyyy-LL-dd'));
-  const [observations, setObservations] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selected = e.target.files[0];
-      const allowed = ['image/jpeg', 'image/png', 'image/jpg'];
-      if (!allowed.includes(selected.type)) {
-        setError('Solo se permiten imágenes (jpg, jpeg, png).');
-        setFile(null);
-        setPreviewUrl(null);
-        return;
-      }
-      setError(null);
-      setFile(selected);
-      setPreviewUrl(URL.createObjectURL(selected));
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setFile(null);
-    setPreviewUrl(null);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reference || !date || !file) {
-      setError('Por favor, complete todos los campos obligatorios.');
-      return;
-    }
-    setError(null);
-    onSubmit({ reference, date, amount, observations, file });
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left: Form fields */}
-        <div className="space-y-4 md:pr-6">
-          <div className="flex justify-center">
-            <div className="bg-white rounded-xl shadow-md border border-gray-100 px-6 py-4 w-full max-w-xs flex flex-col items-center text-center">
-              <div className="flex items-center gap-2 mb-2 text-[#d64d04]">
-                <FaUniversity className="w-6 h-6" />
-                <span className="font-bold text-lg">Banco de Centro América BAC</span>
-              </div>
-              <div className="text-sm text-gray-700 space-y-1">
-                <div><span className="font-medium">N° Cuenta:</span> 0101-01-010101-0101</div>
-                <div><span className="font-medium">Nombre:</span> Momba Shop</div>
-                <div><span className="font-medium">RIF:</span> J0101010100</div>
-                <div><span className="font-medium">Correo:</span> mombashop@gmail.com</div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Referencia <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d64d04]"
-              value={reference}
-              onChange={e => setReference(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Transacción <span className="text-red-500">*</span></label>
-            <input
-              type="date"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d64d04]"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Monto</label>
-            <input
-              type="text"
-              className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500"
-              value={`$${amount.toFixed(2)}`}
-              disabled
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-            <textarea
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d64d04]"
-              value={observations}
-              onChange={e => setObservations(e.target.value)}
-              rows={2}
-            />
-          </div>
-        </div>
-        {/* Right: Image upload/preview */}
-        <div className="flex flex-col h-full justify-center md:pl-6">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Comprobante <span className="text-red-500">*</span></label>
-          <div className="flex flex-col gap-2 h-full">
-            {!previewUrl && (
-              <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#d64d04] transition">
-                <span className="text-gray-400 text-sm mb-2">Haz clic para seleccionar una imagen (jpg, jpeg, png)</span>
-                <input
-                  type="file"
-                  accept=".jpg,.jpeg,.png"
-                  className="hidden"
-                  onChange={handleFileChange}
-                  required
-                />
-              </label>
-            )}
-            {previewUrl && (
-              <div className="relative w-full bg-gray-50 border border-dashed border-[#d64d04] rounded-lg p-4 flex items-center justify-center mt-2 min-h-[300px] max-h-[400px] overflow-auto">
-                <img src={previewUrl} alt="Comprobante" className="max-h-[350px] w-auto max-w-full rounded shadow object-contain mx-auto" />
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-1 shadow hover:bg-red-100 text-red-500 border border-red-200"
-                  aria-label="Eliminar imagen"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            )}
-          </div>
-          <span className="text-xs text-gray-500 mt-4 block">Formatos permitidos: jpg, jpeg, png</span>
-          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-        </div>
-      </div>
-      <div className="flex justify-center mt-8">
-        <button
-          type="submit"
-          className="w-full max-w-xs py-2 px-4 bg-[#d64d04] text-white rounded font-semibold hover:bg-orange-600 transition flex items-center justify-center gap-2 disabled:opacity-60"
-          disabled={isSubmitting}
-        >
-          <FaFileUpload /> {isSubmitting ? 'Enviando...' : 'Enviar Pago'}
-        </button>
-      </div>
-    </form>
-  );
-};
-
 // Modal component for reuse
 const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => {
   if (!isOpen) return null;
@@ -339,6 +186,8 @@ export default function CartPage() {
   const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer'>('paypal');
   const [isSubmittingTransfer, setIsSubmittingTransfer] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [entities, setEntities] = useState<FinancialEntity[]>([]);
+  const [loadingEntities, setLoadingEntities] = useState(false);
 
   const loadCart = useCallback(async () => {
     if (!user) return;
@@ -377,6 +226,16 @@ export default function CartPage() {
     loadCart();
     loadShippingFee();
   }, [user, router, loadCart, loadShippingFee]);
+
+  useEffect(() => {
+    if (showTransferModal) {
+      setLoadingEntities(true);
+      getFinancialEntities().then(res => {
+        if (res.success) setEntities(res.entities);
+        setLoadingEntities(false);
+      });
+    }
+  }, [showTransferModal]);
 
   const handlePaymentSuccess = async (paypalDetails: PayPalOrderData) => {
     try {
@@ -563,11 +422,18 @@ export default function CartPage() {
       
       <Modal isOpen={showTransferModal} onClose={() => setShowTransferModal(false)}>
         <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Pago por Transferencia</h2>
-        <BankTransferForm
-          amount={parseFloat(cart.sub_total) + parseFloat(shippingFee)}
-          onSubmit={handleTransferSubmit}
-          isSubmitting={isSubmittingTransfer}
-        />
+        {loadingEntities ? (
+          <div className="flex justify-center items-center min-h-[200px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#d64d04]"></div>
+          </div>
+        ) : (
+          <BankTransferForm
+            amount={parseFloat(cart.sub_total) + parseFloat(shippingFee)}
+            onSubmit={handleTransferSubmit}
+            isSubmitting={isSubmittingTransfer}
+            entities={entities}
+          />
+        )}
       </Modal>
       
       <Popup 
