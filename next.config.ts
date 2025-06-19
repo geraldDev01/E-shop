@@ -23,6 +23,16 @@ const nextConfig = {
         hostname: 'jimclark.com.ve',
         pathname: '/wp-content/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 's.alicdn.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dwb4e796j3qlg.cloudfront.net',
+        pathname: '/**',
+      },
     ],
   },
 }

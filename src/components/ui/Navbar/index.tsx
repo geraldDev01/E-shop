@@ -81,7 +81,6 @@ const Navbar = () => {
   const navLinks = [
     { href: "/", label: "Inicio", icon: IoHomeOutline },
     { href: "/categories", label: "Categorías", icon: IoGridOutline },
-    { href: "/contact", label: "Contactenos", icon: IoMailOutline },
   ];
 
   return (

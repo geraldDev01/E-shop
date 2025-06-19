@@ -1,11 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { IoMailOutline, IoKeyOutline, IoLogInOutline, IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
+import Link from 'next/link';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { IoMailOutline, IoKeyOutline, IoLogInOutline } from 'react-icons/io5';
 import { login } from '@/api/auth';
 import { useAuth } from '@/context/auth/AuthContext';
 
@@ -13,7 +13,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login: authLogin } = useAuth();
   const [apiError, setApiError] = useState<string | null>(null);
-  
+  const [showPassword, setShowPassword] = useState(false);
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -47,94 +48,76 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h1 className="text-center text-2xl font-bold leading-9 tracking-tight text-[#d64d04]">
-          Iniciar Sesión
-        </h1>
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form 
-          onSubmit={formik.handleSubmit}
-          className="space-y-6"
-        >
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fff7f0] to-white px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
+        <div className="mb-6">
+          <IoLogInOutline className="w-16 h-16 text-[#d64d04] mx-auto" />
+        </div>
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">¡Bienvenido de nuevo!</h1>
+        <p className="text-gray-500 mb-6 text-center">Inicia sesión para continuar con tus compras.</p>
+        <form className="w-full space-y-5" onSubmit={formik.handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6">
-              Email
-            </label>
-            <div className="relative mt-2">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <IoMailOutline className="text-gray-500" />
-              </div>
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <div className="relative">
+              <IoMailOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                id="email"
                 type="email"
                 {...formik.getFieldProps('email')}
-                className={`block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset 
-                  ${formik.touched.email && formik.errors.email 
-                    ? 'ring-red-500 focus:ring-red-500' 
-                    : 'ring-gray-300 focus:ring-primary-950'} 
-                  focus:ring-2 focus:ring-inset`}
+                className={`w-full pl-10 pr-3 py-3 rounded-lg border ${formik.touched.email && formik.errors.email ? 'border-red-400' : 'border-gray-200'} focus:border-[#d64d04] focus:ring-2 focus:ring-[#ffd6b3] outline-none`}
+                placeholder="tu@email.com"
+                autoComplete="email"
               />
             </div>
             {formik.touched.email && formik.errors.email && (
               <p className="mt-2 text-sm text-red-500">{formik.errors.email}</p>
             )}
           </div>
-
-          {/* Password Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium leading-6">
-              Contraseña
-            </label>
-            <div className="relative mt-2">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <IoKeyOutline className="text-gray-500" />
-              </div>
+            <label className="block text-sm font-medium mb-1">Contraseña</label>
+            <div className="relative">
+              <IoKeyOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 {...formik.getFieldProps('password')}
-                className={`block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset 
-                  ${formik.touched.password && formik.errors.password 
-                    ? 'ring-red-500 focus:ring-red-500' 
-                    : 'ring-gray-300 focus:ring-primary-950'} 
-                  focus:ring-2 focus:ring-inset`}
+                className={`w-full pl-10 pr-10 py-3 rounded-lg border ${formik.touched.password && formik.errors.password ? 'border-red-400' : 'border-gray-200'} focus:border-[#d64d04] focus:ring-2 focus:ring-[#ffd6b3] outline-none`}
+                placeholder="Tu contraseña"
+                autoComplete="current-password"
               />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                onClick={() => setShowPassword((v) => !v)}
+                tabIndex={-1}
+              >
+                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+              </button>
             </div>
             {formik.touched.password && formik.errors.password && (
               <p className="mt-2 text-sm text-red-500">{formik.errors.password}</p>
             )}
+            <div className="text-right mt-1">
+              <Link href="/auth/forgot" className="text-xs text-[#d64d04] hover:underline">¿Olvidaste tu contraseña?</Link>
+            </div>
           </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={formik.isSubmitting}
-            className="btn-primary mt-8"
+            className="w-full flex items-center justify-center gap-2 bg-[#d64d04] text-white py-3 rounded-lg font-bold text-lg shadow-md hover:bg-orange-600 transition"
           >
-            <IoLogInOutline size={20} />
+            <IoLogInOutline className="w-5 h-5" />
             {formik.isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
           {apiError && (
-          <p className="mt-4 text-center text-sm text-red-500 bg-red-50 p-2 rounded-md">
-            {apiError}
-          </p>
-        )}
+            <p className="mt-4 text-center text-sm text-red-500 bg-red-50 p-2 rounded-md">
+              {apiError}
+            </p>
+          )}
         </form>
-
-        {/* Links */}
         <div className="mt-6 text-center text-sm text-gray-500">
-          <div className="mt-2">
-            ¿No tienes cuenta?{' '}
-            <Link 
-              href="/auth/register" 
-              className="font-semibold text-primary-950 hover:text-primary-800"
-            >
-              Regístrate
-            </Link>
-          </div>
+          ¿No tienes cuenta?{' '}
+          <Link href="/auth/register" className="font-semibold text-[#d64d04] hover:underline">
+            Regístrate
+          </Link>
         </div>
       </div>
     </div>
