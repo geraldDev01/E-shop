@@ -3,10 +3,19 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { FaUniversity, FaFileUpload } from 'react-icons/fa';
 import type { FinancialEntity } from '@/api/financialEntities';
+import Image from 'next/image';
+
+export interface BankTransferFormValues {
+  entity: string;
+  reference: string;
+  date: string;
+  observations: string;
+  file: File | null;
+}
 
 interface BankTransferFormProps {
   amount: number;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: BankTransferFormValues & { amount: number }) => void;
   isSubmitting: boolean;
   entities: FinancialEntity[];
 }
@@ -15,13 +24,13 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
 
-  const formik = useFormik({
+  const formik = useFormik<BankTransferFormValues>({
     initialValues: {
       entity: '',
       reference: '',
       date: '',
       observations: '',
-      file: null as File | null,
+      file: null,
     },
     validationSchema: Yup.object({
       entity: Yup.string().required('Seleccione una entidad bancaria'),
@@ -172,7 +181,15 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
             )}
             {previewUrl && (
               <div className="relative w-full bg-gray-50 border border-dashed border-[#d64d04] rounded-lg p-4 flex items-center justify-center mt-2 min-h-[300px] max-h-[400px] overflow-auto">
-                <img src={previewUrl} alt="Comprobante" className="max-h-[350px] w-auto max-w-full rounded shadow object-contain mx-auto" />
+                <Image
+                  src={previewUrl}
+                  alt="Comprobante"
+                  width={350}
+                  height={350}
+                  className="max-h-[350px] w-auto max-w-full rounded shadow object-contain mx-auto"
+                  style={{ objectFit: 'contain' }}
+                  unoptimized
+                />
                 <button
                   type="button"
                   onClick={handleRemoveImage}

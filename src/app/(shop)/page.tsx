@@ -3,7 +3,7 @@ import { ProductList } from '@/components/products/ProductList'
 import imageTest from '@/assets/image.png'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { getCategories } from '@/api/categories'
 
 interface Category {
@@ -11,7 +11,7 @@ interface Category {
   description: string;
 }
 
-export default function ShopPage() {
+function ShopContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const categoryId = searchParams.get('categoryId')
@@ -117,5 +117,13 @@ export default function ShopPage() {
         <ProductList categoryId={activeCategory} />
       </section>
     </div>
+  )
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense>
+      <ShopContent />
+    </Suspense>
   )
 }

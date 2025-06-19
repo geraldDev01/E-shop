@@ -9,7 +9,6 @@ import {
   IoPersonOutline,
   IoHomeOutline,
   IoGridOutline,
-  IoMailOutline,
   IoChevronDownOutline
 } from 'react-icons/io5'
 import { useAuth } from '@/context/auth/AuthContext'

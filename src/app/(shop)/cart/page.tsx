@@ -9,10 +9,10 @@ import { getFees } from '@/api/fees';
 import { PayPalButton } from '@/components/products/PayPalButton';
 import { Popup } from '@/components/ui/Popup';
 import { createOrder } from '@/api/orders';
-import { FaRegCreditCard, FaPaypal, FaUniversity, FaFileUpload } from 'react-icons/fa';
-import { DateTime } from 'luxon';
+import { FaRegCreditCard, FaPaypal } from 'react-icons/fa';
 import BankTransferForm from '@/components/ui/BankTransferForm';
 import { getFinancialEntities, FinancialEntity } from '@/api/financialEntities';
+import { BankTransferFormValues } from '@/components/ui/BankTransferForm';
 
 // Add interfaces for type safety
 interface CartItem {
@@ -283,11 +283,12 @@ export default function CartPage() {
     });
   };
 
-  const handleTransferSubmit = async (data: any) => {
+  const handleTransferSubmit = async (data: BankTransferFormValues & { amount: number }) => {
     setIsSubmittingTransfer(true);
     try {
       // TODO: Implement API call to submit transfer payment
       // Example: await submitBankTransfer(user.token, data)
+      console.log('Transfer data:', data);
       setPopup({
         show: true,
         message: 'Comprobante enviado. Procesaremos tu pago pronto.',
@@ -299,7 +300,7 @@ export default function CartPage() {
     } catch (error) {
       setPopup({
         show: true,
-        message: 'Error al enviar el comprobante',
+        message: (error as Error).message || 'Error al enviar el comprobante',
         type: 'error',
       });
     } finally {
