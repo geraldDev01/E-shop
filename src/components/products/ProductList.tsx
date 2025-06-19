@@ -4,7 +4,11 @@ import { Product } from '@/api/products';
 import { ProductCard } from './ProductCard';
 import { getProducts } from '@/api/products';
 
-export const ProductList = () => {
+interface ProductListProps {
+  categoryId?: string | null;
+}
+
+export const ProductList = ({ categoryId }: ProductListProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,6 +24,10 @@ export const ProductList = () => {
     loadProducts();
   }, []);
 
+  const filteredProducts = categoryId
+    ? products.filter(product => String(product.id_clasificaion) === String(categoryId))
+    : products;
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -28,7 +36,7 @@ export const ProductList = () => {
     );
   }
 
-  if (products.length === 0) {
+  if (filteredProducts.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <p className="text-gray-500">No hay productos disponibles</p>
@@ -37,8 +45,8 @@ export const ProductList = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
-      {products.map(product => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-10">
+      {filteredProducts.map(product => (
         <ProductCard key={product.id} product={product} />
       ))}
     </div>

@@ -77,7 +77,7 @@ export default function CategoriesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {categories.map((category) => (
           <Link 
-            href={`/category/${category.id}`} 
+            href={`/?categoryId=${category.id}`} 
             key={category.id}
             className="group"
           >

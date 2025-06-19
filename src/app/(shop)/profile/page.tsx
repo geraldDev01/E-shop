@@ -153,28 +153,28 @@ export default function ProfilePage() {
         <div className="flex-1 w-full">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
+              <div>
               <div className="flex items-center gap-2 mb-1">
                 <IoPersonCircleOutline className="text-xl text-[#d64d04]" />
                 <span className="text-sm text-gray-500">Nombre completo</span>
               </div>
               <div className="font-semibold text-lg text-gray-800">{user.profile.full_name}</div>
             </div>
-            <div>
+              <div>
               <div className="flex items-center gap-2 mb-1">
                 <IoMailOutline className="text-xl text-[#d64d04]" />
                 <span className="text-sm text-gray-500">Correo electrónico</span>
               </div>
               <div className="font-semibold text-lg text-gray-800">{user.profile.email}</div>
             </div>
-            <div>
+              <div>
               <div className="flex items-center gap-2 mb-1">
                 <IoCallOutline className="text-xl text-[#d64d04]" />
                 <span className="text-sm text-gray-500">Teléfono</span>
               </div>
               <div className="font-semibold text-lg text-gray-800">{user.profile.phone || 'No especificado'}</div>
             </div>
-            <div>
+              <div>
               <div className="flex items-center gap-2 mb-1">
                 <IoLocationOutline className="text-xl text-[#d64d04]" />
                 <span className="text-sm text-gray-500">Dirección</span>
@@ -182,29 +182,29 @@ export default function ProfilePage() {
               <div className="font-semibold text-lg text-gray-800">{user.profile.address || 'No especificada'}</div>
             </div>
           </div>
-          {user.profile.department_description && (
-            <div className="mt-6 pt-6 border-t">
-              <h3 className="font-bold text-gray-800 mb-2">Ubicación</h3>
-              <p className="text-gray-600">
-                {user.profile.department_description}
-                {user.profile.municipality_description && 
-                  `, ${user.profile.municipality_description}`
-                }
-              </p>
-            </div>
-          )}
+        {user.profile.department_description && (
+          <div className="mt-6 pt-6 border-t">
+            <h3 className="font-bold text-gray-800 mb-2">Ubicación</h3>
+            <p className="text-gray-600">
+              {user.profile.department_description}
+              {user.profile.municipality_description && 
+                `, ${user.profile.municipality_description}`
+              }
+            </p>
+          </div>
+        )}
         </div>
       </div>
 
       {/* Orders Table */}
       <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Mis Pedidos</h2>
-        <Table 
-          columns={columns}
-          data={displayOrders}
-          isLoading={isLoading}
-          emptyMessage="No has realizado ningún pedido aún"
-        />
+          <Table 
+            columns={columns}
+            data={displayOrders}
+            isLoading={isLoading}
+            emptyMessage="No has realizado ningún pedido aún"
+          />
       </div>
     </div>
   );

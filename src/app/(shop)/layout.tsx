@@ -17,7 +17,7 @@ export default function ShopLayout({
     <PayPalProvider>
       <div className="min-h-screen">
         <Navbar />
-        <main className="container mx-auto px-4 py-8">
+        <main className="min-h-screen bg-[#FEF8F1]">
           {children}
         </main>
         <ChatBot />
