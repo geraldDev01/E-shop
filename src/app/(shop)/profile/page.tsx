@@ -136,70 +136,75 @@ export default function ProfilePage() {
   }));
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Mi Perfil</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <IoPersonCircleOutline className="text-2xl text-[#d64d04]" />
-              <div>
-                <p className="text-sm text-gray-500">Nombre completo</p>
-                <p className="font-medium">{user.profile.full_name}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <IoMailOutline className="text-2xl text-[#d64d04]" />
-              <div>
-                <p className="text-sm text-gray-500">Correo electrónico</p>
-                <p className="font-medium">{user.profile.email}</p>
-              </div>
-            </div>
+    <div className="max-w-5xl mx-auto px-4 py-10">
+      {/* Profile Card */}
+      <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col md:flex-row gap-8 items-center md:items-start mb-10 border border-gray-100">
+        {/* Avatar */}
+        <div className="flex-shrink-0 flex flex-col items-center justify-center w-full md:w-auto">
+          <div className="w-28 h-28 rounded-full bg-[#fff7f0] flex items-center justify-center shadow-md mb-4">
+            <IoPersonCircleOutline className="w-20 h-20 text-[#d64d04]" />
           </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <IoCallOutline className="text-2xl text-[#d64d04]" />
-              <div>
-                <p className="text-sm text-gray-500">Teléfono</p>
-                <p className="font-medium">{user.profile.phone || 'No especificado'}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <IoLocationOutline className="text-2xl text-[#d64d04]" />
-              <div>
-                <p className="text-sm text-gray-500">Dirección</p>
-                <p className="font-medium">{user.profile.address || 'No especificada'}</p>
-              </div>
-            </div>
+          <div className="text-center md:hidden">
+            <p className="text-lg font-bold text-gray-800">{user.profile.full_name}</p>
+            <p className="text-sm text-gray-500">{user.profile.email}</p>
           </div>
         </div>
-
-        {user.profile.department_description && (
-          <div className="mt-6 pt-6 border-t">
-            <h3 className="font-bold text-gray-800 mb-2">Ubicación</h3>
-            <p className="text-gray-600">
-              {user.profile.department_description}
-              {user.profile.municipality_description && 
-                `, ${user.profile.municipality_description}`
-              }
-            </p>
+        {/* Info */}
+        <div className="flex-1 w-full">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <IoPersonCircleOutline className="text-xl text-[#d64d04]" />
+                <span className="text-sm text-gray-500">Nombre completo</span>
+              </div>
+              <div className="font-semibold text-lg text-gray-800">{user.profile.full_name}</div>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <IoMailOutline className="text-xl text-[#d64d04]" />
+                <span className="text-sm text-gray-500">Correo electrónico</span>
+              </div>
+              <div className="font-semibold text-lg text-gray-800">{user.profile.email}</div>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <IoCallOutline className="text-xl text-[#d64d04]" />
+                <span className="text-sm text-gray-500">Teléfono</span>
+              </div>
+              <div className="font-semibold text-lg text-gray-800">{user.profile.phone || 'No especificado'}</div>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <IoLocationOutline className="text-xl text-[#d64d04]" />
+                <span className="text-sm text-gray-500">Dirección</span>
+              </div>
+              <div className="font-semibold text-lg text-gray-800">{user.profile.address || 'No especificada'}</div>
+            </div>
           </div>
-        )}
+          {user.profile.department_description && (
+            <div className="mt-6 pt-6 border-t">
+              <h3 className="font-bold text-gray-800 mb-2">Ubicación</h3>
+              <p className="text-gray-600">
+                {user.profile.department_description}
+                {user.profile.municipality_description && 
+                  `, ${user.profile.municipality_description}`
+                }
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="mt-8">
+      {/* Orders Table */}
+      <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Mis Pedidos</h2>
-        <div className="bg-white rounded-lg shadow-md">
-          <Table 
-            columns={columns}
-            data={displayOrders}
-            isLoading={isLoading}
-            emptyMessage="No has realizado ningún pedido aún"
-          />
-        </div>
+        <Table 
+          columns={columns}
+          data={displayOrders}
+          isLoading={isLoading}
+          emptyMessage="No has realizado ningún pedido aún"
+        />
       </div>
     </div>
   );
