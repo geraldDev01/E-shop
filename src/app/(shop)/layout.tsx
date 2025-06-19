@@ -1,6 +1,7 @@
 import Navbar from "@/components/ui/Navbar";
 import type { Metadata } from "next";
 import { PayPalProvider } from "@/providers/PayPalProvider";
+import ChatBot from '@/components/ui/ChatBot';
 
 export const metadata: Metadata = {
   title: "Shop | Your Store Name",
@@ -19,6 +20,7 @@ export default function ShopLayout({
         <main className="container mx-auto px-4 py-8">
           {children}
         </main>
+        <ChatBot />
       </div>
     </PayPalProvider>
   );

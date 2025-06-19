@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { IoMailOutline, IoKeyOutline, IoPersonOutline, IoPhonePortraitOutline, IoLocationOutline } from 'react-icons/io5';
+import { IoMailOutline, IoKeyOutline, IoPersonOutline, IoPhonePortraitOutline, IoLocationOutline, IoPersonAddOutline, IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
 import { register } from '@/api/auth';
 import { useAuth } from '@/context/auth/AuthContext';
 import { getDepartments, getMunicipalities } from '@/api/locations';
@@ -27,6 +27,8 @@ export default function RegisterPage() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [departments, setDepartments] = useState<Array<{ id: number; description: string }>>([]);
   const [municipalities, setMunicipalities] = useState<Array<{ id: number; description: string }>>([]);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   
   useEffect(() => {
     const loadDepartments = async () => {
@@ -121,26 +123,24 @@ export default function RegisterPage() {
     name: keyof FormValues,
     label: string,
     type: string,
-    icon: React.ReactNode
+    icon: React.ReactNode,
+    extra?: React.ReactNode
   ) => (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium leading-6">
+      <label htmlFor={name} className="block text-sm font-medium mb-1">
         {label}
       </label>
-      <div className="relative mt-2">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+      <div className="relative">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2">
           {icon}
         </div>
         <input
           id={name}
           type={type}
           {...formik.getFieldProps(name)}
-          className={`block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset 
-            ${formik.touched[name] && formik.errors[name]
-              ? 'ring-red-500 focus:ring-red-500' 
-              : 'ring-gray-300 focus:ring-primary-950'} 
-            focus:ring-2 focus:ring-inset`}
+          className={`w-full pl-10 pr-10 py-3 rounded-lg border ${formik.touched[name] && formik.errors[name] ? 'border-red-400' : 'border-gray-200'} focus:border-[#d64d04] focus:ring-2 focus:ring-[#ffd6b3] outline-none`}
         />
+        {extra}
       </div>
       {formik.touched[name] && formik.errors[name] && (
         <p className="mt-2 text-sm text-red-500">{formik.errors[name]}</p>
@@ -156,11 +156,11 @@ export default function RegisterPage() {
     onChange?: (value: string) => void
   ) => (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium leading-6">
+      <label htmlFor={name} className="block text-sm font-medium mb-1">
         {label}
       </label>
-      <div className="relative mt-2">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+      <div className="relative">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2">
           {icon}
         </div>
         <select
@@ -173,11 +173,7 @@ export default function RegisterPage() {
               formik.handleChange(e);
             }
           }}
-          className={`block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset 
-            ${formik.touched[name] && formik.errors[name]
-              ? 'ring-red-500 focus:ring-red-500' 
-              : 'ring-gray-300 focus:ring-primary-950'} 
-            focus:ring-2 focus:ring-inset`}
+          className={`w-full pl-10 pr-3 py-3 rounded-lg border ${formik.touched[name] && formik.errors[name] ? 'border-red-400' : 'border-gray-200'} focus:border-[#d64d04] focus:ring-2 focus:ring-[#ffd6b3] outline-none`}
         >
           <option value="">Seleccionar</option>
           {options.map(option => (
@@ -194,27 +190,44 @@ export default function RegisterPage() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h1 className="text-center text-2xl font-bold leading-9 tracking-tight text-[#d64d04]">
-          Crear Cuenta
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fff7f0] to-white px-4">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
+        <div className="mb-6">
+          <IoPersonAddOutline className="w-16 h-16 text-[#d64d04] mx-auto" />
+        </div>
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">Crear Cuenta</h1>
+        <p className="text-gray-500 mb-6 text-center">Crea tu cuenta para comenzar a comprar.</p>
         {apiError && (
-          <p className="mt-4 text-center text-sm text-red-500 bg-red-50 p-2 rounded-md">
+          <p className="mb-4 text-center text-sm text-red-500 bg-red-50 p-2 rounded-md">
             {apiError}
           </p>
         )}
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-2xl">
-        <form onSubmit={formik.handleSubmit} className="space-y-6">
+        <form onSubmit={formik.handleSubmit} className="w-full space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {renderField('full_name', 'Nombre Completo', 'text', <IoPersonOutline className="text-gray-500" />)}
             {renderField('phone', 'Teléfono', 'tel', <IoPhonePortraitOutline className="text-gray-500" />)}
             {renderField('email', 'Email', 'email', <IoMailOutline className="text-gray-500" />)}
             {renderField('address', 'Dirección', 'text', <IoLocationOutline className="text-gray-500" />)}
-            {renderField('password', 'Contraseña', 'password', <IoKeyOutline className="text-gray-500" />)}
-            {renderField('password_confirmation', 'Confirmar Contraseña', 'password', <IoKeyOutline className="text-gray-500" />)}
+            {renderField('password', 'Contraseña', showPassword ? 'text' : 'password', <IoKeyOutline className="text-gray-500" />,
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                onClick={() => setShowPassword((v) => !v)}
+                tabIndex={-1}
+              >
+                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+              </button>
+            )}
+            {renderField('password_confirmation', 'Confirmar Contraseña', showPasswordConfirm ? 'text' : 'password', <IoKeyOutline className="text-gray-500" />,
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                onClick={() => setShowPasswordConfirm((v) => !v)}
+                tabIndex={-1}
+              >
+                {showPasswordConfirm ? <IoEyeOffOutline /> : <IoEyeOutline />}
+              </button>
+            )}
             {renderSelectField(
               'id_department',
               'Departamento',
@@ -229,22 +242,17 @@ export default function RegisterPage() {
               <IoLocationOutline className="text-gray-500" />
             )}
           </div>
-
           <button
             type="submit"
             disabled={formik.isSubmitting}
-            className="btn-primary mt-8 w-full md:w-auto md:min-w-[200px] md:mx-auto block"
+            className="w-full flex items-center justify-center gap-2 bg-[#d64d04] text-white py-3 rounded-lg font-bold text-lg shadow-md hover:bg-orange-600 transition"
           >
             {formik.isSubmitting ? 'Registrando...' : 'Registrarse'}
           </button>
         </form>
-
-        <div className="mt-10 text-center text-sm text-gray-500">
+        <div className="mt-8 text-center text-sm text-gray-500">
           ¿Ya tienes cuenta?{' '}
-          <Link 
-            href="/auth/login" 
-            className="font-semibold text-primary-950 hover:text-primary-800"
-          >
+          <Link href="/auth/login" className="font-semibold text-[#d64d04] hover:underline">
             Inicia Sesión
           </Link>
         </div>
