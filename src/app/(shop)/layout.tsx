@@ -17,7 +17,7 @@ export default function ShopLayout({
     <PayPalProvider>
       <div className="min-h-screen">
         <Navbar />
-        <main className="min-h-screen bg-[#FEF8F1]">
+        <main className="min-h-screen bg-gradient-to-br from-[#FEF8F1] via-white to-[#fff7f0] transition-colors duration-300">
           {children}
         </main>
         <ChatBot />

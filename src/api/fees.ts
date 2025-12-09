@@ -12,10 +12,10 @@ interface FeesResponse {
   data: Fee[];
 }
 
-export const getFees = async (token: string, department_id: number, municipality_id: number) => {
+export const getFees = async (token: string, municipality_id: number) => {
   try {
     const response = await apiRequest<FeesResponse>({
-      endpoint: `/administration/fees?department_id=${department_id}&municipality_id=${municipality_id}`,
+      endpoint: `/public/fees/municipality_id=${municipality_id}`,
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`

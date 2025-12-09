@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState, use } from 'react';
 import { notFound } from "next/navigation";
-import Image from 'next/image';
 import Link from 'next/link';
 import { IoCartOutline, IoArrowBack, IoCheckmarkCircle, IoClose } from "react-icons/io5";
 import { getProductById } from '@/api/products';
@@ -10,11 +9,13 @@ import { addToCart } from '@/api/cart';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth/AuthContext';
 import { useCart } from '@/context/cart/CartContext';
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 
 // Separate client component
 function ProductDetailContent({ id }: { id: string }) {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [notFoundError, setNotFoundError] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [showSizeError, setShowSizeError] = useState(false);
@@ -28,19 +29,23 @@ function ProductDetailContent({ id }: { id: string }) {
       try {
         const productId = parseInt(id);
         if (isNaN(productId)) {
-          notFound();
+          setNotFoundError(true);
+          setIsLoading(false);
           return;
         }
 
         const result = await getProductById(productId);
+        console.log('Product API result:', { success: result.success, hasProduct: !!result.product, message: result.message });
         if (result.success && result.product) {
           setProduct(result.product);
+          setNotFoundError(false);
         } else {
-          notFound();
+          console.error('Product not found or API error:', result.message);
+          setNotFoundError(true);
         }
       } catch (error: unknown) {
         console.error('Failed to load product:', error instanceof Error ? error.message : 'Unknown error');
-        notFound();
+        setNotFoundError(true);
       } finally {
         setIsLoading(false);
       }
@@ -58,9 +63,15 @@ function ProductDetailContent({ id }: { id: string }) {
     );
   }
 
-  // Error state
+  // Error state - call notFound() during render, not in effect
+  // Only call it after loading is complete and we know the product doesn't exist
+  if (!isLoading && (notFoundError || !product)) {
+    notFound();
+  }
+
+  // This should never be reached if notFound() is called, but TypeScript needs it
   if (!product) {
-    return notFound();
+    return null;
   }
 
   const handleSizeChange = (size: string) => {
@@ -137,35 +148,36 @@ function ProductDetailContent({ id }: { id: string }) {
     if (!showSuccessModal) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-        <div className="bg-white rounded-lg p-6 max-w-sm w-full relative animate-fade-in">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fade-in">
+        <div className="card rounded-2xl p-8 max-w-md w-full relative animate-fade-in-up shadow-2xl border-2 border-green-200">
           <button 
             onClick={() => setShowSuccessModal(false)}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
           >
             <IoClose className="w-6 h-6" />
           </button>
           
           <div className="flex flex-col items-center text-center">
-            <div className="mb-4">
-              <IoCheckmarkCircle className="w-16 h-16 text-green-500" />
+            <div className="mb-6 relative">
+              <div className="absolute inset-0 bg-green-500/20 rounded-full blur-xl"></div>
+              <IoCheckmarkCircle className="w-20 h-20 text-green-500 relative z-10" />
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               ¡Producto Agregado!
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-8">
               El producto ha sido agregado exitosamente a tu carrito
             </p>
             <div className="flex gap-4 w-full">
               <button
                 onClick={() => setShowSuccessModal(false)}
-                className="flex-1 py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 px-4 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700"
               >
                 Seguir Comprando
               </button>
               <button
                 onClick={() => router.push('/cart')}
-                className="flex-1 py-2 px-4 bg-[#d64d04] text-white rounded-md hover:bg-[#b54403] transition-colors"
+                className="flex-1 py-3 px-4 bg-[#d64d04] text-white rounded-lg hover:bg-[#b54403] transition-colors font-semibold shadow-lg"
               >
                 Ver Carrito
               </button>
@@ -181,53 +193,55 @@ function ProductDetailContent({ id }: { id: string }) {
       {/* Back button */}
       <Link 
         href="/"
-        className="inline-flex items-center text-gray-600 hover:text-[#d64d04] mb-6 transition-colors"
+        className="inline-flex items-center text-gray-600 hover:text-[#d64d04] mb-8 transition-colors font-medium"
       >
         <IoArrowBack className="mr-2" />
         Volver a productos
       </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Product Image */}
-        <div className="relative aspect-square rounded-lg overflow-hidden bg-white shadow-sm">
-          <Image
+        <div className="relative aspect-square rounded-2xl overflow-hidden card shadow-xl">
+          <ImageWithFallback
             src={product.img_url}
             alt={product.name}
-            className="object-cover"
             fill
+            className="object-cover"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
           />
         </div>
 
         {/* Product Info */}
-        <div className="flex flex-col">
+        <div className="flex flex-col space-y-6">
           {/* Header */}
-          <div className="mb-6">
-            <span className="text-sm text-gray-500">{product.clasification}</span>
-            <h1 className="text-3xl font-bold text-gray-800 mt-1">{product.name}</h1>
-            <p className="text-2xl font-bold text-[#d64d04] mt-2">
+          <div>
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 mb-3">
+              {product.clasification}
+            </span>
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-4">{product.name}</h1>
+            <p className="text-3xl font-bold text-[#d64d04]">
               ${parseFloat(product.price).toFixed(2)}
             </p>
           </div>
 
           {/* Sizes */}
-          <div className="mb-6">
-            <h3 className="font-bold text-gray-800 mb-4">Tallas Disponibles</h3>
-            <div className="flex flex-wrap gap-2">
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4 text-lg">Tallas Disponibles</h3>
+            <div className="flex flex-wrap gap-3">
               {product.presentations.map((presentation) => (
                 <button
                   key={presentation.presentation_id}
                   onClick={() => handleSizeChange(presentation.presentation_description)}
                   disabled={parseInt(presentation.quantity) === 0}
                   className={`
-                    w-14 h-14 rounded-full border-2 flex items-center justify-center
-                    transition-all
+                    w-16 h-16 rounded-xl border-2 flex items-center justify-center font-semibold
+                    transition-all duration-200
                     ${parseInt(presentation.quantity) === 0 
                       ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                       : selectedSize === presentation.presentation_description
-                        ? 'border-[#d64d04] bg-[#d64d04] text-white'
-                        : 'border-gray-300 hover:border-[#d64d04]'
+                        ? 'border-[#d64d04] bg-[#d64d04] text-white shadow-lg scale-105'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-[#d64d04] hover:scale-105'
                     }
                   `}
                 >
@@ -236,7 +250,7 @@ function ProductDetailContent({ id }: { id: string }) {
               ))}
             </div>
             {showSizeError && (
-              <p className="text-red-500 text-sm mt-2">
+              <p className="text-red-500 text-sm mt-3 font-medium">
                 * Por favor seleccione una talla
               </p>
             )}
@@ -244,23 +258,25 @@ function ProductDetailContent({ id }: { id: string }) {
 
           {/* Quantity */}
           {selectedSize && (
-            <div className="mb-6">
-              <h3 className="font-bold text-gray-800 mb-4">Cantidad</h3>
+            <div>
+              <h3 className="font-bold text-gray-900 mb-4 text-lg">Cantidad</h3>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => handleQuantityChange(quantity - 1)}
                   disabled={quantity <= 1}
-                  className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center
-                    hover:border-[#d64d04] disabled:border-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white flex items-center justify-center font-bold text-lg
+                    hover:border-[#d64d04] hover:bg-orange-50
+                    disabled:border-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:hover:bg-white transition-all"
                 >
                   -
                 </button>
-                <span className="w-12 text-center font-medium">{quantity}</span>
+                <span className="w-16 text-center font-bold text-xl text-gray-900">{quantity}</span>
                 <button
                   onClick={() => handleQuantityChange(quantity + 1)}
                   disabled={quantity >= getCurrentStock()}
-                  className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center
-                    hover:border-[#d64d04] disabled:border-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white flex items-center justify-center font-bold text-lg
+                    hover:border-[#d64d04] hover:bg-orange-50
+                    disabled:border-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:hover:bg-white transition-all"
                 >
                   +
                 </button>
@@ -272,34 +288,34 @@ function ProductDetailContent({ id }: { id: string }) {
           <button
             onClick={handleAddToCart}
             disabled={!selectedSize || getCurrentStock() === 0}
-            className="btn-primary mb-5 w-full flex items-center justify-center gap-2 
-              disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-primary mb-2 w-full flex items-center justify-center gap-2 text-lg py-4
+              disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
           >
-            <IoCartOutline size={20} />
+            <IoCartOutline size={24} />
             {getAvailableSizes().length > 0 ? 'Agregar al Carrito' : 'No Disponible'}
           </button>
 
           {/* Stock Status */}
-          <div className="flex items-center mt-2 mb-6">
+          <div className="flex items-center p-4 rounded-lg bg-green-50 border border-green-200">
             <IoCheckmarkCircle 
-              className={`mr-2 text-xl ${
+              className={`mr-3 text-2xl ${
                 getAvailableSizes().length > 0 ? 'text-green-500' : 'text-red-500'
               }`} 
             />
-            <span className="text-sm">
+            <span className="text-sm font-medium text-gray-700">
               {selectedSize 
                 ? `${getCurrentStock()} unidades disponibles en talla ${selectedSize}`
                 : getAvailableSizes().length > 0
-                  ? 'Seleccione una talla'
+                  ? 'Seleccione una talla para continuar'
                   : 'Producto agotado'
               }
             </span>
           </div>
 
           {/* Description */}
-          <div className="border-t pt-6">
-            <h3 className="font-bold text-gray-800 mb-2">Descripción</h3>
-            <p className="text-gray-600">{product.description}</p>
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="font-bold text-gray-900 mb-3 text-lg">Descripción</h3>
+            <p className="text-gray-600 leading-relaxed">{product.description}</p>
           </div>
         </div>
       </div>

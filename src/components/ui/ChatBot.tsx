@@ -91,7 +91,7 @@ export default function ChatBot() {
         <div className="fixed inset-0 z-50 flex items-end justify-end">
           <div className="w-full sm:max-w-md bg-white/90 rounded-t-2xl sm:rounded-2xl shadow-2xl mb-4 sm:mb-6 mr-0 sm:mr-6 flex flex-col h-[70vh] max-h-[500px] animate-fade-in-up border border-[#ffe6d4] backdrop-blur-md">
             {/* Header with gradient and online indicator */}
-            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#ffe6d4] via-[#fff7f0] to-[#f9fafb] rounded-t-2xl border-b">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#ffe6d4] via-[#fff7f0] to-[#f9fafb] rounded-t-2xl border-b border-gray-200">
               <div className="flex items-center gap-2">
                 <IoStorefrontOutline className="text-[#d64d04] w-6 h-6" />
                 <span className="font-bold text-lg text-gray-800">Momba Bot</span>
@@ -108,7 +108,7 @@ export default function ChatBot() {
             <div className="flex-1 overflow-y-auto px-4 py-3 bg-[url('data:image/svg+xml;utf8,<svg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'><circle cx=\'1\' cy=\'1\' r=\'1\' fill=\'%23ffe6d4\' fill-opacity=\'0.18\'/></svg>')] bg-[#fff7f0]">
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex mb-2 ${msg.from === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                  <div className={`rounded-2xl px-4 py-2 max-w-[80%] text-sm shadow ${msg.from === 'user' ? 'bg-[#d64d04] text-white rounded-br-md' : 'bg-white border text-gray-800 rounded-bl-md'}`}>
+                  <div className={`rounded-2xl px-4 py-2 max-w-[80%] text-sm shadow ${msg.from === 'user' ? 'bg-[#d64d04] text-white rounded-br-md' : 'bg-white border border-gray-200 text-gray-800 rounded-bl-md'}`}>
                     {msg.text}
                   </div>
                 </div>
@@ -116,7 +116,7 @@ export default function ChatBot() {
               {/* Typing indicator */}
               {isBotTyping && (
                 <div className="flex mb-2 justify-start animate-fade-in">
-                  <div className="rounded-2xl px-4 py-2 max-w-[80%] text-sm bg-white border text-gray-800 flex items-center gap-2 shadow rounded-bl-md">
+                  <div className="rounded-2xl px-4 py-2 max-w-[80%] text-sm bg-white border border-gray-200 text-gray-800 flex items-center gap-2 shadow rounded-bl-md">
                     <span className="inline-block w-2 h-2 bg-[#d64d04] rounded-full animate-bounce"></span>
                     <span className="inline-block w-2 h-2 bg-[#ffd4a6] rounded-full animate-bounce delay-100"></span>
                     <span className="inline-block w-2 h-2 bg-[#ffe6d4] rounded-full animate-bounce delay-200"></span>
@@ -130,7 +130,7 @@ export default function ChatBot() {
                     {FAQS.map((faq, i) => (
                       <button
                         key={i}
-                        className="text-left bg-white hover:bg-[#ffe6d4] rounded-xl px-3 py-2 text-sm transition flex items-center gap-2 shadow border border-[#ffe6d4]"
+                        className="text-left bg-white hover:bg-[#ffe6d4] rounded-xl px-3 py-2 text-sm transition flex items-center gap-2 shadow border border-[#ffe6d4] text-gray-800"
                         onClick={() => handleFaqClick(faq)}
                       >
                         <FaQuestionCircle className="text-[#d64d04] w-4 h-4" />
@@ -154,7 +154,7 @@ export default function ChatBot() {
             </div>
             {/* Input area with shadow and gradient send button */}
             <form
-              className="flex items-center gap-2 border-t px-4 py-3 bg-white rounded-b-2xl shadow-inner"
+              className="flex items-center gap-2 border-t border-gray-200 px-4 py-3 bg-white rounded-b-2xl shadow-inner"
               onSubmit={e => {
                 e.preventDefault();
                 handleSend(input);
@@ -162,7 +162,7 @@ export default function ChatBot() {
             >
               <input
                 type="text"
-                className="flex-1 rounded-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#d64d04] shadow-sm"
+                className="flex-1 rounded-full border border-gray-300 bg-white text-gray-900 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#d64d04] shadow-sm placeholder:text-gray-400"
                 placeholder="Escribe tu mensaje..."
                 value={input}
                 onChange={e => setInput(e.target.value)}

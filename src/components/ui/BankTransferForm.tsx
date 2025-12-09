@@ -69,17 +69,17 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
     <form onSubmit={formik.handleSubmit} className="animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left: Form fields */}
-        <div className="space-y-4 md:pr-6">
+        <div className="space-y-5 md:pr-6">
           <div className="flex justify-center">
-            <div className="bg-white rounded-xl shadow-md border border-gray-100 px-6 py-4 w-full max-w-xs flex flex-col items-center text-center">
-              <div className="flex items-center gap-2 mb-2 text-[#d64d04]">
-                <FaUniversity className="w-6 h-6" />
+            <div className="card rounded-xl shadow-lg border-2 border-orange-200 px-6 py-5 w-full max-w-xs flex flex-col items-center text-center">
+              <div className="flex items-center gap-2 mb-3 text-[#d64d04]">
+                <FaUniversity className="w-7 h-7" />
                 <span className="font-bold text-lg">Seleccione Banco</span>
               </div>
-              <div className="text-sm text-gray-700 space-y-1">
+              <div className="text-sm text-gray-700 space-y-2 w-full">
                 <select
                   name="entity"
-                  className="w-full border rounded px-2 py-1 mt-2"
+                  className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#d64d04] focus:border-transparent transition-all"
                   value={formik.values.entity}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -92,7 +92,7 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
                   ))}
                 </select>
                 {formik.touched.entity && formik.errors.entity && (
-                  <div className="text-red-500 text-xs mt-1">{formik.errors.entity}</div>
+                  <div className="text-red-500 text-xs mt-1 font-medium">{formik.errors.entity}</div>
                 )}
                 {/* Mostrar detalles de la cuenta seleccionada */}
                 {formik.values.entity && (
@@ -101,10 +101,10 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
                       const selected = entities.find(e => e.financial_id === Number(formik.values.entity));
                       if (!selected) return null;
                       return (
-                        <div className="mt-2 text-left text-xs text-gray-600 space-y-1">
-                          <div><span className="font-medium">N° Cuenta:</span> {selected.account_reference_number}</div>
-                          <div><span className="font-medium">Nombre:</span> {selected.account_reference_name}</div>
-                          <div><span className="font-medium">Moneda:</span> {selected.currency}</div>
+                        <div className="mt-3 p-3 bg-orange-50 rounded-lg text-left text-xs text-gray-700 space-y-1 border border-orange-200">
+                          <div><span className="font-semibold">N° Cuenta:</span> {selected.account_reference_number}</div>
+                          <div><span className="font-semibold">Nombre:</span> {selected.account_reference_name}</div>
+                          <div><span className="font-semibold">Moneda:</span> {selected.currency}</div>
                         </div>
                       );
                     })()}
@@ -114,62 +114,63 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Referencia <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Referencia <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="reference"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d64d04]"
+              className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#d64d04] focus:border-transparent transition-all"
               value={formik.values.reference}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               required
             />
             {formik.touched.reference && formik.errors.reference && (
-              <div className="text-red-500 text-xs mt-1">{formik.errors.reference}</div>
+              <div className="text-red-500 text-xs mt-1 font-medium">{formik.errors.reference}</div>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Transacción <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha de Transacción <span className="text-red-500">*</span></label>
             <input
               type="date"
               name="date"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d64d04]"
+              className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#d64d04] focus:border-transparent transition-all"
               value={formik.values.date}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               required
             />
             {formik.touched.date && formik.errors.date && (
-              <div className="text-red-500 text-xs mt-1">{formik.errors.date}</div>
+              <div className="text-red-500 text-xs mt-1 font-medium">{formik.errors.date}</div>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Monto</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Monto</label>
             <input
               type="text"
-              className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500"
+              className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-500 cursor-not-allowed"
               value={`$${amount.toFixed(2)}`}
               disabled
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Observaciones</label>
             <textarea
               name="observations"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d64d04]"
+              className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#d64d04] focus:border-transparent transition-all resize-none"
               value={formik.values.observations}
               onChange={formik.handleChange}
-              rows={2}
+              rows={3}
             />
           </div>
         </div>
         {/* Right: Image upload/preview */}
         <div className="flex flex-col h-full justify-center md:pl-6">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Comprobante <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Comprobante <span className="text-red-500">*</span></label>
           <div className="flex flex-col gap-2 h-full">
             {!previewUrl && (
-              <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#d64d04] transition">
-                <span className="text-gray-400 text-sm mb-2">Haz clic para seleccionar una imagen (jpg, jpeg, png)</span>
+              <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-[#d64d04] hover:bg-orange-50/50 transition-all bg-gray-50">
+                <FaFileUpload className="w-12 h-12 text-gray-400 mb-3" />
+                <span className="text-gray-500 text-sm text-center px-4">Haz clic para seleccionar una imagen (jpg, jpeg, png)</span>
                 <input
                   type="file"
                   accept=".jpg,.jpeg,.png"
@@ -180,20 +181,20 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
               </label>
             )}
             {previewUrl && (
-              <div className="relative w-full bg-gray-50 border border-dashed border-[#d64d04] rounded-lg p-4 flex items-center justify-center mt-2 min-h-[300px] max-h-[400px] overflow-auto">
+              <div className="relative w-full bg-gray-50 border-2 border-dashed border-[#d64d04] rounded-xl p-4 flex items-center justify-center mt-2 min-h-[300px] max-h-[400px] overflow-auto">
                 <Image
                   src={previewUrl}
                   alt="Comprobante"
                   width={350}
                   height={350}
-                  className="max-h-[350px] w-auto max-w-full rounded shadow object-contain mx-auto"
+                  className="max-h-[350px] w-auto max-w-full rounded-lg shadow-lg object-contain mx-auto"
                   style={{ objectFit: 'contain' }}
                   unoptimized
                 />
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-1 shadow hover:bg-red-100 text-red-500 border border-red-200"
+                  className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg hover:bg-red-100 text-red-500 border-2 border-red-200 transition-all"
                   aria-label="Eliminar imagen"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -205,14 +206,14 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
           </div>
           <span className="text-xs text-gray-500 mt-4 block">Formatos permitidos: jpg, jpeg, png</span>
           {(fileError || (formik.touched.file && formik.errors.file)) && (
-            <div className="text-red-500 text-sm mt-2">{fileError || formik.errors.file as string}</div>
+            <div className="text-red-500 text-sm mt-2 font-medium">{fileError || formik.errors.file as string}</div>
           )}
         </div>
       </div>
       <div className="flex justify-center mt-8">
         <button
           type="submit"
-          className="w-full max-w-xs py-2 px-4 bg-[#d64d04] text-white rounded font-semibold hover:bg-orange-600 transition flex items-center justify-center gap-2 disabled:opacity-60"
+          className="w-full max-w-xs py-3 px-6 bg-[#d64d04] text-white rounded-lg font-semibold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg hover:shadow-xl disabled:shadow-none"
           disabled={isSubmitting}
         >
           <FaFileUpload /> {isSubmitting ? 'Enviando...' : 'Enviar Pago'}

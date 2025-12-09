@@ -2,11 +2,12 @@
 import { useAuth } from '@/context/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { IoPersonCircleOutline, IoMailOutline, IoCallOutline, IoLocationOutline } from 'react-icons/io5';
+import { IoMailOutline, IoCallOutline, IoLocationOutline } from 'react-icons/io5';
 import { getOrders } from '@/api/orders';
 import { Table } from '@/components/ui/Table';
 import { DateTime } from 'luxon';
 import { Column } from '@/components/ui/Table';
+import { Avatar } from '@/components/ui/Avatar';
 
 interface Order {
   id: number;
@@ -138,73 +139,76 @@ export default function ProfilePage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
       {/* Profile Card */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col md:flex-row gap-8 items-center md:items-start mb-10 border border-gray-100">
+      <div className="card rounded-2xl shadow-xl p-8 flex flex-col md:flex-row gap-8 items-center md:items-start mb-10">
         {/* Avatar */}
         <div className="flex-shrink-0 flex flex-col items-center justify-center w-full md:w-auto">
-          <div className="w-28 h-28 rounded-full bg-[#fff7f0] flex items-center justify-center shadow-md mb-4">
-            <IoPersonCircleOutline className="w-20 h-20 text-[#d64d04]" />
-          </div>
-          <div className="text-center md:hidden">
-            <p className="text-lg font-bold text-gray-800">{user.profile.full_name}</p>
+          <Avatar
+            name={user.profile.full_name}
+            email={user.profile.email}
+            size="xl"
+            variant="profile"
+          />
+          <div className="text-center md:hidden mt-4">
+            <p className="text-lg font-bold text-gray-900">{user.profile.full_name}</p>
             <p className="text-sm text-gray-500">{user.profile.email}</p>
           </div>
         </div>
         {/* Info */}
         <div className="flex-1 w-full">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Mi Perfil</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-              <div className="flex items-center gap-2 mb-1">
-                <IoPersonCircleOutline className="text-xl text-[#d64d04]" />
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <IoMailOutline className="text-xl text-[#d64d04]" />
                 <span className="text-sm text-gray-500">Nombre completo</span>
               </div>
-              <div className="font-semibold text-lg text-gray-800">{user.profile.full_name}</div>
+              <div className="font-semibold text-lg text-gray-900">{user.profile.full_name}</div>
             </div>
-              <div>
-              <div className="flex items-center gap-2 mb-1">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
                 <IoMailOutline className="text-xl text-[#d64d04]" />
                 <span className="text-sm text-gray-500">Correo electrónico</span>
               </div>
-              <div className="font-semibold text-lg text-gray-800">{user.profile.email}</div>
+              <div className="font-semibold text-lg text-gray-900 break-all">{user.profile.email}</div>
             </div>
-              <div>
-              <div className="flex items-center gap-2 mb-1">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
                 <IoCallOutline className="text-xl text-[#d64d04]" />
                 <span className="text-sm text-gray-500">Teléfono</span>
               </div>
-              <div className="font-semibold text-lg text-gray-800">{user.profile.phone || 'No especificado'}</div>
+              <div className="font-semibold text-lg text-gray-900">{user.profile.phone || 'No especificado'}</div>
             </div>
-              <div>
-              <div className="flex items-center gap-2 mb-1">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
                 <IoLocationOutline className="text-xl text-[#d64d04]" />
                 <span className="text-sm text-gray-500">Dirección</span>
               </div>
-              <div className="font-semibold text-lg text-gray-800">{user.profile.address || 'No especificada'}</div>
+              <div className="font-semibold text-lg text-gray-900">{user.profile.address || 'No especificada'}</div>
             </div>
           </div>
-        {user.profile.department_description && (
-          <div className="mt-6 pt-6 border-t">
-            <h3 className="font-bold text-gray-800 mb-2">Ubicación</h3>
-            <p className="text-gray-600">
-              {user.profile.department_description}
-              {user.profile.municipality_description && 
-                `, ${user.profile.municipality_description}`
-              }
-            </p>
-          </div>
-        )}
+          {user.profile.department_description && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <h3 className="font-bold text-gray-900 mb-2">Ubicación</h3>
+              <p className="text-gray-600">
+                {user.profile.department_description}
+                {user.profile.municipality_description && 
+                  `, ${user.profile.municipality_description}`
+                }
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Mis Pedidos</h2>
-          <Table 
-            columns={columns}
-            data={displayOrders}
-            isLoading={isLoading}
-            emptyMessage="No has realizado ningún pedido aún"
-          />
+      <div className="card rounded-2xl shadow-xl p-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Mis Pedidos</h2>
+        <Table 
+          columns={columns}
+          data={displayOrders}
+          isLoading={isLoading}
+          emptyMessage="No has realizado ningún pedido aún"
+        />
       </div>
     </div>
   );

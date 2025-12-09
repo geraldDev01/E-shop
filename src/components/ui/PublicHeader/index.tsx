@@ -8,7 +8,7 @@ export const PublicHeader = () => {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="font-medium">
           <Link href="/">
-            <h1 className="text-xl sm:text-2xl">
+            <h1 className="text-xl sm:text-2xl text-gray-900">
               <strong className='text-[#d64d04]'>MOMBA</strong> - SHOP
             </h1>
           </Link>

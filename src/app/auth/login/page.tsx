@@ -48,22 +48,27 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#fff7f0] to-white px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
-        <div className="mb-6">
-          <IoLogInOutline className="w-16 h-16 text-[#d64d04] mx-auto" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fff7f0] via-white to-orange-50 px-4 transition-colors duration-300">
+      <div className="w-full max-w-md card rounded-2xl shadow-2xl p-8 flex flex-col items-center border-2 border-gray-200">
+        <div className="mb-6 relative">
+          <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-xl"></div>
+          <IoLogInOutline className="w-16 h-16 text-[#d64d04] mx-auto relative z-10" />
         </div>
         <h1 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">¡Bienvenido de nuevo!</h1>
         <p className="text-gray-500 mb-6 text-center">Inicia sesión para continuar con tus compras.</p>
         <form className="w-full space-y-5" onSubmit={formik.handleSubmit}>
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">Email</label>
             <div className="relative">
               <IoMailOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="email"
                 {...formik.getFieldProps('email')}
-                className={`w-full pl-10 pr-3 py-3 rounded-lg border ${formik.touched.email && formik.errors.email ? 'border-red-400' : 'border-gray-200'} focus:border-[#d64d04] focus:ring-2 focus:ring-[#ffd6b3] outline-none`}
+                className={`w-full pl-10 pr-3 py-3 rounded-lg border-2 bg-white text-gray-900 ${
+                  formik.touched.email && formik.errors.email 
+                    ? 'border-red-400' 
+                    : 'border-gray-200'
+                } focus:border-[#d64d04] focus:ring-2 focus:ring-[#ffd6b3] outline-none transition-all`}
                 placeholder="tu@email.com"
                 autoComplete="email"
               />
@@ -73,19 +78,23 @@ export default function LoginPage() {
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Contraseña</label>
+            <label className="block text-sm font-semibold mb-2 text-gray-700">Contraseña</label>
             <div className="relative">
               <IoKeyOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 {...formik.getFieldProps('password')}
-                className={`w-full pl-10 pr-10 py-3 rounded-lg border ${formik.touched.password && formik.errors.password ? 'border-red-400' : 'border-gray-200'} focus:border-[#d64d04] focus:ring-2 focus:ring-[#ffd6b3] outline-none`}
+                className={`w-full pl-10 pr-10 py-3 rounded-lg border-2 bg-white text-gray-900 ${
+                  formik.touched.password && formik.errors.password 
+                    ? 'border-red-400' 
+                    : 'border-gray-200'
+                } focus:border-[#d64d04] focus:ring-2 focus:ring-[#ffd6b3] outline-none transition-all`}
                 placeholder="Tu contraseña"
                 autoComplete="current-password"
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 onClick={() => setShowPassword((v) => !v)}
                 tabIndex={-1}
               >
@@ -102,13 +111,13 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={formik.isSubmitting}
-            className="w-full flex items-center justify-center gap-2 bg-[#d64d04] text-white py-3 rounded-lg font-bold text-lg shadow-md hover:bg-orange-600 transition"
+            className="w-full flex items-center justify-center gap-2 bg-[#d64d04] text-white py-3 rounded-lg font-bold text-lg shadow-lg hover:bg-orange-600 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <IoLogInOutline className="w-5 h-5" />
             {formik.isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
           {apiError && (
-            <p className="mt-4 text-center text-sm text-red-500 bg-red-50 p-2 rounded-md">
+            <p className="mt-4 text-center text-sm text-red-500 bg-red-50 p-3 rounded-lg border border-red-200">
               {apiError}
             </p>
           )}

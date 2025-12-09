@@ -25,11 +25,27 @@ interface ProductsResponse {
   data: Product[];
 }
 
+interface ApiProductData {
+  id: number;
+  img_url: string | null;
+  sku: string;
+  name: string;
+  description: string;
+  price: string;
+  id_clasificaion: number;
+  clasification: string;
+  presentations: Array<{
+    presentation_id: number;
+    presentation_description: string;
+    quantity: string;
+  }>;
+}
+
 interface SingleProductResponse {
   status_code: number;
   message: string;
   data: {
-    product: Product;
+    product: ApiProductData;
   };
 }
 
@@ -68,12 +84,52 @@ export const getProductById = async (id: number) => {
       method: 'GET'
     });
 
+    if (response.status_code !== 200) {
+      return {
+        success: false,
+        product: null,
+        message: response.message || 'Error al obtener el producto'
+      };
+    }
+
+    // Check if data exists
+    if (!response.data || !response.data.product) {
+      return {
+        success: false,
+        product: null,
+        message: 'El producto no contiene datos'
+      };
+    }
+
+    // Transform API response to match Product interface
+    const apiProduct = response.data.product;
+    
+    // Map presentations from API response
+    const presentations: Presentation[] = (apiProduct.presentations || []).map((presentation) => ({
+      presentation_id: presentation.presentation_id,
+      presentation_description: presentation.presentation_description,
+      quantity: presentation.quantity
+    }));
+
+    const product: Product = {
+      id: apiProduct.id,
+      id_clasificaion: apiProduct.id_clasificaion,
+      clasification: apiProduct.clasification || '',
+      sku: apiProduct.sku,
+      name: apiProduct.name,
+      description: apiProduct.description || '',
+      img_url: apiProduct.img_url || '',
+      price: apiProduct.price,
+      presentations: presentations
+    };
+
     return {
-      success: response.status_code === 200,
-      product: response.data.product,
+      success: true,
+      product: product,
       message: response.message
     };
   } catch (error: unknown) {
+    console.error('Error in getProductById:', error);
     if (error instanceof AxiosError) {
       return {
         success: false,
