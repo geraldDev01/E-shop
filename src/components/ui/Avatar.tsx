@@ -5,7 +5,6 @@ import { IoPersonCircleOutline } from 'react-icons/io5'
 
 interface AvatarProps {
   name?: string
-  email?: string
   src?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   className?: string
@@ -48,7 +47,6 @@ const getInitials = (name: string): string => {
 
 export const Avatar = ({
   name = 'Usuario',
-  email,
   src,
   size = 'md',
   className = '',

@@ -211,7 +211,6 @@ export default function CartPage() {
     const result = await getFees(
       user.token,
       user.profile.department_id,
-      user.profile.municipality_id
     );
     
     if (result.success) {

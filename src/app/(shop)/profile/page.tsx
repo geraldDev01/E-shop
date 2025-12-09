@@ -144,7 +144,6 @@ export default function ProfilePage() {
         <div className="flex-shrink-0 flex flex-col items-center justify-center w-full md:w-auto">
           <Avatar
             name={user.profile.full_name}
-            email={user.profile.email}
             size="xl"
             variant="profile"
           />
