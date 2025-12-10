@@ -47,4 +47,43 @@ export const getUserProfile = async (token: string) => {
       message: 'Error al obtener el perfil'
     };
   }
+};
+
+export interface UpdateProfileData extends Record<string, unknown> {
+  full_name: string;
+  phone: string;
+  address: string;
+  email: string;
+  id_department: number;
+  id_municipality: number;
+}
+
+export const updateProfile = async (token: string, data: UpdateProfileData) => {
+  try {
+    const response = await apiRequest<ProfileResponse>({
+      endpoint: '/customer/profile',
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      data: { data }
+    });
+
+    return {
+      success: response.status_code === 200,
+      message: response.message,
+      profile: response.data
+    };
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Error al actualizar el perfil'
+      };
+    }
+    return {
+      success: false,
+      message: 'Error al actualizar el perfil'
+    };
+  }
 }; 
