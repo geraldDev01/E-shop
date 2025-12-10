@@ -19,10 +19,30 @@ export interface Product {
   presentations: Presentation[];
 }
 
+interface ApiProductListItem {
+  id: number;
+  img_url: string | null;
+  sku: string;
+  name: string;
+  description: string;
+  price: string;
+  // API may return either category_id or id_clasificaion
+  category_id?: number;
+  id_clasificaion?: number;
+  // API may return either category_description or clasification
+  category_description?: string;
+  clasification?: string;
+  presentations: Array<{
+    presentation_id: number;
+    presentation_description: string;
+    quantity: string;
+  }>;
+}
+
 interface ProductsResponse {
   status_code: number;
   message: string;
-  data: Product[];
+  data: ApiProductListItem[];
 }
 
 interface ApiProductData {
@@ -56,9 +76,44 @@ export const getProducts = async () => {
       method: 'GET'
     });
 
+    if (response.status_code !== 200) {
+      return {
+        success: false,
+        products: [],
+        message: response.message || 'Error al obtener los productos'
+      };
+    }
+
+    // Transform API response to match Product interface
+    // Handle both category_id/category_description and id_clasificaion/clasification
+    const products: Product[] = (response.data || []).map((apiProduct) => {
+      // Map presentations
+      const presentations: Presentation[] = (apiProduct.presentations || []).map((presentation) => ({
+        presentation_id: presentation.presentation_id,
+        presentation_description: presentation.presentation_description,
+        quantity: presentation.quantity
+      }));
+
+      // Map category fields - API may return category_id or id_clasificaion
+      const id_clasificaion = apiProduct.id_clasificaion ?? apiProduct.category_id ?? 0;
+      const clasification = apiProduct.clasification || apiProduct.category_description || '';
+
+      return {
+        id: apiProduct.id,
+        id_clasificaion: id_clasificaion,
+        clasification: clasification,
+        sku: apiProduct.sku,
+        name: apiProduct.name,
+        description: apiProduct.description || '',
+        img_url: apiProduct.img_url || '',
+        price: apiProduct.price,
+        presentations: presentations
+      };
+    });
+
     return {
-      success: response.status_code === 200,
-      products: response.data,
+      success: true,
+      products: products,
       message: response.message
     };
   } catch (error: unknown) {

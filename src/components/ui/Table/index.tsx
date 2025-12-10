@@ -9,9 +9,10 @@ interface TableProps<T> {
   data: T[];
   isLoading?: boolean;
   emptyMessage?: string;
+  onRowClick?: (item: T) => void;
 }
 
-export function Table<T>({ columns, data, isLoading = false, emptyMessage = "No hay datos disponibles" }: TableProps<T>) {
+export function Table<T>({ columns, data, isLoading = false, emptyMessage = "No hay datos disponibles", onRowClick }: TableProps<T>) {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -45,7 +46,11 @@ export function Table<T>({ columns, data, isLoading = false, emptyMessage = "No 
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {data.map((item, rowIndex) => (
-            <tr key={rowIndex} className="hover:bg-gray-50">
+            <tr 
+              key={rowIndex} 
+              onClick={() => onRowClick?.(item)}
+              className={`${onRowClick ? 'cursor-pointer' : ''} hover:bg-gray-50`}
+            >
               {columns.map((column, colIndex) => (
                 <td key={colIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {column.render 

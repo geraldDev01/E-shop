@@ -277,6 +277,9 @@ export default function ProfilePage() {
     }
   ];
 
+  // Create a map of order IDs to full order objects for easy lookup
+  const ordersMap = new Map(orders.map(order => [order.id, order]));
+
   // Transform orders to OrderDisplay type
   const displayOrders: OrderDisplay[] = orders.map(({ 
     id, 
@@ -290,6 +293,15 @@ export default function ProfilePage() {
     status,
     address: user.profile?.address || 'No especificada'
   }));
+
+  const handleOrderClick = (orderDisplay: OrderDisplay) => {
+    const fullOrder = ordersMap.get(orderDisplay.id);
+    if (fullOrder) {
+      // Store order data in sessionStorage for the detail page
+      sessionStorage.setItem(`order_${fullOrder.id}`, JSON.stringify(fullOrder));
+      router.push(`/orders/${fullOrder.id}`);
+    }
+  };
 
   const renderField = (
     name: keyof FormValues,
@@ -489,6 +501,7 @@ export default function ProfilePage() {
           data={displayOrders}
           isLoading={isLoading}
           emptyMessage="No has realizado ningún pedido aún"
+          onRowClick={handleOrderClick}
         />
       </div>
     </div>

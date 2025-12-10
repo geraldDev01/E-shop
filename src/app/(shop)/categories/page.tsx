@@ -10,6 +10,7 @@ import {
   IoStorefrontOutline,
   IoArrowForwardOutline
 } from 'react-icons/io5'
+import { PiPants } from "react-icons/pi";
 
 interface Category {
   id: number;
@@ -22,7 +23,7 @@ const getCategoryIcon = (description: string): ReactElement => {
     'Camisas': <IoShirtOutline className="w-16 h-16 text-[#d64d04]" />,
     'Zapatos': <IoFootstepsOutline className="w-16 h-16 text-[#d64d04]" />,
     'Gorras': <IoBaseballOutline className="w-16 h-16 text-[#d64d04]" />,
-    'Pantalon': <IoShirtOutline className="w-16 h-16 text-[#d64d04]" />,
+    'Pantalon': <PiPants className="w-16 h-16 text-[#d64d04]" />,
   }
   return icons[description]
 }
