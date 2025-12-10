@@ -284,20 +284,53 @@ export default function CartPage() {
   };
 
   const handleTransferSubmit = async (data: BankTransferFormValues & { amount: number }) => {
-    setIsSubmittingTransfer(true);
-    try {
-      // TODO: Implement API call to submit transfer payment
-      // Example: await submitBankTransfer(user.token, data)
-      console.log('Transfer data:', data);
+    if (!user?.profile || !cart || !data.file) {
       setPopup({
         show: true,
-        message: 'Comprobante enviado. Procesaremos tu pago pronto.',
-        type: 'success',
+        message: 'Por favor, completa todos los campos requeridos',
+        type: 'error',
       });
-      updateCartCount();
-      setShowTransferModal(false);
-      router.push('/orders/thank-you');
+      return;
+    }
+
+    setIsSubmittingTransfer(true);
+    try {
+      // Build order data
+      const orderData = {
+        customer_id: user.profile.id.toString(),
+        detail: cart.detail.map(item => ({
+          product_id: item.product_id,
+          presentation_id: item.id_presentation,
+          unit_price: parseFloat(item.unit_price),
+          quantity: parseInt(item.quantity)
+        }))
+      };
+
+      // Build transfer data
+      const transferData = {
+        entity: data.entity,
+        reference: data.reference,
+        date: data.date,
+        observations: data.observations || undefined
+      };
+
+      // Call createOrder with transfer data and image file
+      const result = await createOrder(user.token, orderData, transferData, data.file);
+      
+      if (result.success) {
+        setPopup({
+          show: true,
+          message: 'Comprobante enviado. Procesaremos tu pago pronto.',
+          type: 'success',
+        });
+        updateCartCount();
+        setShowTransferModal(false);
+        router.push('/orders/thank-you');
+      } else {
+        throw new Error(result.message || 'Error al enviar el comprobante');
+      }
     } catch (error) {
+      console.error('Error submitting transfer:', error);
       setPopup({
         show: true,
         message: (error as Error).message || 'Error al enviar el comprobante',

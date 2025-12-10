@@ -7,7 +7,7 @@ const BASE_URL = 'http://34.193.187.29:3000/api/v1';
 interface ApiRequestConfig {
   endpoint: string;
   method?: Method;
-  data?: Record<string, unknown> | null;
+  data?: Record<string, unknown> | FormData | null;
   headers?: Record<string, string>;
 }
 
@@ -17,11 +17,14 @@ export const apiRequest = async <T>({
   data = null, 
   headers = {} 
 }: ApiRequestConfig): Promise<T> => {
+  const isFormData = data instanceof FormData;
+  
   const config: AxiosRequestConfig = {
     url: `${BASE_URL}${endpoint}`,
     method,
     headers: {
-      'Content-Type': 'application/json',
+      // Don't set Content-Type for FormData - let browser set it with boundary
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       'x-api-key': API_KEY,
       ...headers
     },
