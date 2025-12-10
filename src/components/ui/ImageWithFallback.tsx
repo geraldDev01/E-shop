@@ -51,6 +51,7 @@ export const ImageWithFallback = ({
     return (
       <Image
         {...imageProps}
+        alt={alt}
         fill
         style={{ objectFit: 'cover' }}
       />
@@ -60,6 +61,7 @@ export const ImageWithFallback = ({
   return (
     <Image
       {...imageProps}
+      alt={alt}
       width={width || 400}
       height={height || 400}
     />

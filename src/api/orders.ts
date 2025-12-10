@@ -62,7 +62,6 @@ export const createOrder = async (
 ) => {
   try {
     let requestData: FormData | Record<string, unknown>;
-    let response: CreateOrderResponse;
 
     // If image file is provided, use FormData (bank transfer)
     if (imageFile && transferData) {
@@ -89,7 +88,7 @@ export const createOrder = async (
       requestData = { data: orderData };
     }
 
-    response = await apiRequest<CreateOrderResponse>({
+    const response = await apiRequest<CreateOrderResponse>({
       endpoint: '/customer/orders',
       method: 'POST',
       data: requestData,

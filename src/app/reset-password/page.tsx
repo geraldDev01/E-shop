@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { IoKeyOutline, IoLockClosedOutline, IoEyeOutline, IoEyeOffOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
 import Link from 'next/link';
 import { useFormik } from 'formik';
@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { resetPassword } from '@/api/auth';
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [apiError, setApiError] = useState<string | null>(null);
@@ -218,5 +218,19 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fff7f0] via-white to-orange-50 px-4">
+        <div className="w-full max-w-md card rounded-2xl shadow-2xl p-8 flex flex-col items-center border-2 border-white/50 bg-white/95 backdrop-blur-sm">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#d64d04]"></div>
+        </div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
