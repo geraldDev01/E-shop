@@ -5,7 +5,9 @@ import {
     AuthResult, 
     LoginCredentials, 
     RegisterCredentials,
-    ErrorResponse 
+    ErrorResponse,
+    ApiResult,
+    ApiResponse
 } from '@/types/api';
 import Cookies from 'js-cookie';
 import { redirect } from 'next/navigation';
@@ -86,4 +88,70 @@ export const logout = () => {
     
     // Redirect to login page
     redirect('/');
+};
+
+export const requestPasswordReset = async (email: string): Promise<ApiResult> => {
+    try {
+        const response = await apiRequest<ApiResponse>({
+            endpoint: '/auth/request-password-reset',
+            method: 'POST',
+            data: { email }
+        });
+
+        if (response.status_code === 200 || response.status_code === 201) {
+            return {
+                success: true
+            };
+        }
+
+        return {
+            success: false,
+            error: response.message || "Error al solicitar el restablecimiento de contraseña"
+        };
+
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            return {
+                success: false,
+                error: error.response?.data?.message || "Error al solicitar el restablecimiento de contraseña"
+            };
+        }
+        return {
+            success: false,
+            error: "Error al solicitar el restablecimiento de contraseña"
+        };
+    }
+};
+
+export const resetPassword = async (token: string, password: string): Promise<ApiResult> => {
+    try {
+        const response = await apiRequest<ApiResponse>({
+            endpoint: '/auth/reset-password',
+            method: 'POST',
+            data: { token, password }
+        });
+
+        if (response.status_code === 200 || response.status_code === 201) {
+            return {
+                success: true
+            };
+        }
+
+        return {
+            success: false,
+            error: response.message || "Error al restablecer la contraseña"
+        };
+
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            return {
+                success: false,
+                error: error.response?.data?.message || "Error al restablecer la contraseña"
+            };
+        }
+        return {
+            success: false,
+            error: "Error al restablecer la contraseña"
+        };
+    }
 };

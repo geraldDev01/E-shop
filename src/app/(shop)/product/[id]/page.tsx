@@ -295,22 +295,6 @@ function ProductDetailContent({ id }: { id: string }) {
             {getAvailableSizes().length > 0 ? 'Agregar al Carrito' : 'No Disponible'}
           </button>
 
-          {/* Stock Status */}
-          <div className="flex items-center p-4 rounded-lg bg-green-50 border border-green-200">
-            <IoCheckmarkCircle 
-              className={`mr-3 text-2xl ${
-                getAvailableSizes().length > 0 ? 'text-green-500' : 'text-red-500'
-              }`} 
-            />
-            <span className="text-sm font-medium text-gray-700">
-              {selectedSize 
-                ? `${getCurrentStock()} unidades disponibles en talla ${selectedSize}`
-                : getAvailableSizes().length > 0
-                  ? 'Seleccione una talla para continuar'
-                  : 'Producto agotado'
-              }
-            </span>
-          </div>
 
           {/* Description */}
           <div className="border-t border-gray-200 pt-6">
