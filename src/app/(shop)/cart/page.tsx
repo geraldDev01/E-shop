@@ -251,8 +251,24 @@ export default function CartPage() {
         }))
       };
 
-      console.log('PayPal Order ID:', paypalDetails.orderID); // Using paypalDetails
-      const result = await createOrder(user.token, orderData);
+      // Calculate total amount
+      const totalAmount = parseFloat(cart.sub_total) + parseFloat(shippingFee);
+      
+      // Generate random short reference number (4 digits, e.g., "0022")
+      const randomReference = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+      
+      // Build PayPal payment data
+      const paypalPaymentData = {
+        payment_method: "PAYPAL" as const,
+        reference_number: randomReference,
+        financial_entity: "",
+        account_reference: paypalDetails.orderID || paypalDetails.paymentID || "123123123",
+        currency: "USD",
+        amount: totalAmount.toFixed(2)
+      };
+
+      console.log('PayPal Order ID:', paypalDetails.orderID);
+      const result = await createOrder(user.token, orderData, undefined, undefined, paypalPaymentData);
       if (result.success) {
         setPopup({
           show: true,
@@ -306,12 +322,24 @@ export default function CartPage() {
         }))
       };
 
+      // Find the selected entity to get account_reference and currency
+      // Compare as strings to handle both string and number types (form values are always strings)
+      const selectedEntity = entities.find(e => 
+        String(e.financial_id) === String(data.entity)
+      );
+      if (!selectedEntity) {
+        throw new Error('Entidad financiera no encontrada');
+      }
+
       // Build transfer data
       const transferData = {
         entity: data.entity,
         reference: data.reference,
         date: data.date,
-        observations: data.observations || undefined
+        observations: data.observations || undefined,
+        account_reference: selectedEntity.account_reference_number,
+        currency: selectedEntity.currency,
+        amount: data.amount
       };
 
       // Call createOrder with transfer data and image file

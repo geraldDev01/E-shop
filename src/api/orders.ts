@@ -20,6 +20,18 @@ interface TransferData {
   reference: string;
   date: string;
   observations?: string;
+  account_reference: string;
+  currency: string;
+  amount: number;
+}
+
+interface PayPalPaymentData {
+  payment_method: "PAYPAL";
+  reference_number: string;
+  financial_entity: string;
+  account_reference: string;
+  currency: string;
+  amount: string;
 }
 
 interface CreateOrderResponse {
@@ -58,7 +70,8 @@ export const createOrder = async (
   token: string, 
   orderData: CreateOrderData['data'],
   transferData?: TransferData,
-  imageFile?: File
+  imageFile?: File,
+  paypalPaymentData?: PayPalPaymentData
 ) => {
   try {
     let requestData: FormData | Record<string, unknown>;
@@ -67,13 +80,17 @@ export const createOrder = async (
     if (imageFile && transferData) {
       const formData = new FormData();
       
-      // Combine order data with transfer data
+      // Combine order data with payment object
       const combinedData = {
         ...orderData,
-        entity: transferData.entity,
-        reference: transferData.reference,
-        date: transferData.date,
-        ...(transferData.observations && { observations: transferData.observations })
+        payment: {
+          payment_method: "TRANSFER",
+          reference_number: transferData.reference,
+          financial_entity: transferData.entity,
+          account_reference: transferData.account_reference,
+          currency: transferData.currency,
+          amount: transferData.amount.toString()
+        }
       };
       
       // Add data as JSON string
@@ -83,8 +100,15 @@ export const createOrder = async (
       formData.append('image', imageFile);
       
       requestData = formData;
+    } else if (paypalPaymentData) {
+      // PayPal payment - include payment object in JSON request
+      const combinedData = {
+        ...orderData,
+        payment: paypalPaymentData
+      };
+      requestData = { data: combinedData };
     } else {
-      // Regular JSON request (PayPal)
+      // Regular JSON request (no payment method specified)
       requestData = { data: orderData };
     }
 

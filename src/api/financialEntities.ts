@@ -22,9 +22,21 @@ export const getFinancialEntities = async () => {
       endpoint: '/public/financial-entities',
       method: 'GET',
     });
+    // Normalize financial_id to number since API returns it as string
+    const normalizedEntities = response.data.map(entity => {
+      // Handle both string and number types from API
+      const financialId = typeof entity.financial_id === 'string' 
+        ? Number(entity.financial_id) 
+        : (typeof entity.financial_id === 'number' ? entity.financial_id : Number(entity.financial_id));
+      
+      return {
+        ...entity,
+        financial_id: financialId
+      };
+    });
     return {
       success: response.status_code === 200,
-      entities: response.data,
+      entities: normalizedEntities,
       message: response.message,
     };
   } catch (error: unknown) {

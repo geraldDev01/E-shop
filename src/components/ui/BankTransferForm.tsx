@@ -98,7 +98,7 @@ export default function BankTransferForm({ amount, onSubmit, isSubmitting, entit
                 {formik.values.entity && (
                   <>
                     {(() => {
-                      const selected = entities.find(e => e.financial_id === Number(formik.values.entity));
+                      const selected = entities.find(e => String(e.financial_id) === String(formik.values.entity));
                       if (!selected) return null;
                       return (
                         <div className="mt-3 p-3 bg-orange-50 rounded-lg text-left text-xs text-gray-700 space-y-1 border border-orange-200">
