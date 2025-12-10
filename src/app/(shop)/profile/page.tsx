@@ -9,25 +9,21 @@ import { DateTime } from 'luxon';
 import { Column } from '@/components/ui/Table';
 import { Avatar } from '@/components/ui/Avatar';
 
+interface OrderItem {
+  id: number;
+  product_description: string;
+  presentation_description: string;
+  quantity: number;
+  unit_price: number;
+  sub_total: number;
+}
+
 interface Order {
   id: number;
-  order_code: string;
-  order_date: string;
-  delivery_date: string | null;
-  order_state_id: string;
-  order_state_description: string;
-  customer_id: number;
-  customer_name: string;
-  delivery_address: string;
-  contact_phone: string;
-  total_items: string;
-  sub_total: string;
-  shipping_fee: string;
-  total_invoice: string;
-  shipping_date: null;
-  cancellation_date: null;
-  canceled_by: null;
-  cancellation_reason: null;
+  created_at: string;
+  total: number;
+  status: string;
+  detail: OrderItem[];
 }
 
 interface GetOrdersResponse {
@@ -75,7 +71,13 @@ export default function ProfilePage() {
     );
   }
 
-  type OrderDisplay = Pick<Order, 'id' | 'order_date' | 'total_invoice' | 'order_state_description' | 'delivery_address'>;
+  type OrderDisplay = {
+    id: number;
+    created_at: string;
+    total: number;
+    status: string;
+    address: string;
+  };
   
   const columns: Column<OrderDisplay, keyof OrderDisplay>[] = [
     {
@@ -85,55 +87,64 @@ export default function ProfilePage() {
     },
     {
       header: 'Fecha',
-      accessor: 'order_date',
-      render: (value) => DateTime.fromISO(String(value))
-        .setLocale('es')
-        .toLocaleString({
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
+      accessor: 'created_at',
+      render: (value) => {
+        const date = DateTime.fromISO(String(value));
+        if (!date.isValid) {
+          return 'Fecha inválida';
+        }
+        return date
+          .setLocale('es')
+          .toLocaleString({
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+      }
     },
     {
       header: 'Dirección',
-      accessor: 'delivery_address',
+      accessor: 'address',
       render: (value) => value || 'No especificada'
     },
     {
       header: 'Total',
-      accessor: 'total_invoice',
+      accessor: 'total',
       render: (value) => `$${Number(value).toFixed(2)}`
     },
     {
       header: 'Estado',
-      accessor: 'order_state_description',
-      render: (value) => (
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-          value === 'PENDIENTE CONFIRMACION' ? 'bg-yellow-100 text-yellow-800' :
-          value === 'COMPLETADO' ? 'bg-green-100 text-green-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {value}
-        </span>
-      )
+      accessor: 'status',
+      render: (value) => {
+        const statusText = String(value);
+        return (
+          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+            statusText.includes('Pendiente') ? 'bg-yellow-100 text-yellow-800' :
+            statusText.includes('Completado') ? 'bg-green-100 text-green-800' :
+            statusText.includes('Proceso') ? 'bg-blue-100 text-blue-800' :
+            'bg-gray-100 text-gray-800'
+          }`}>
+            {statusText}
+          </span>
+        );
+      }
     }
   ];
 
   // Transform orders to OrderDisplay type
   const displayOrders: OrderDisplay[] = orders.map(({ 
     id, 
-    order_date, 
-    total_invoice, 
-    order_state_description,
-    delivery_address 
+    created_at, 
+    total, 
+    status
   }) => ({
     id,
-    order_date,
-    total_invoice,
-    order_state_description,
-    delivery_address
+    created_at,
+    total,
+    status,
+    address: user.profile?.address || 'No especificada'
   }));
 
   return (
