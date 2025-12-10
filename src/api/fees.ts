@@ -9,7 +9,7 @@ interface Fee {
 interface FeesResponse {
   status_code: number;
   message: string;
-  data: Fee[];
+  data: Fee;
 }
 
 export const getFees = async (token: string, municipality_id: number) => {
@@ -24,7 +24,7 @@ export const getFees = async (token: string, municipality_id: number) => {
 
     return {
       success: response.status_code === 200,
-      fee: response.data[0]?.amount || '0',
+      fee: response.data?.amount || '0',
       message: response.message
     };
   } catch (error: unknown) {
